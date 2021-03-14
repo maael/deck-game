@@ -1,3 +1,4 @@
+local anim8 = require("vendor.anim8")
 local controls = require "controls".get("player")
 local Inventory = require("inventory")
 local Player = {}
@@ -18,9 +19,19 @@ function Player.new (world, player_spawn)
     physics = {},
     collision_x_limit = nil,
     collision_y_limit = nil,
-    sprite = love.graphics.newImage("assets/sprites/knight.png"),
-    is_active = true
+    is_active = true,
+    animations = {},
+    current_direction = 'right',
+    current_anim = 'idle',
   }
+  local idle_spritesheet = love.graphics.newImage('assets/spritesheets/knight_idle_spritesheet.png')
+  local idle_grid = anim8.newGrid(16, 16, idle_spritesheet:getWidth(), idle_spritesheet:getHeight())
+  local idle_animation = anim8.newAnimation(idle_grid('1-6', 1), 0.2)
+  player.animations.idle = {anim = idle_animation, sprites = idle_spritesheet}
+  local run_spritesheet = love.graphics.newImage('assets/spritesheets/knight_run_spritesheet.png')
+  local run_grid = anim8.newGrid(16, 16, run_spritesheet:getWidth(), run_spritesheet:getHeight())
+  local run_animation = anim8.newAnimation(run_grid('1-6', 1), 0.2)
+  player.animations.run = {anim = run_animation, sprites = run_spritesheet}
   setmetatable(player, Player)
   player.physics.body = love.physics.newBody(world, player.x, player.y, "dynamic")
   player.physics.shape = love.physics.newRectangleShape(0, player.size / 4, player.size,player.size / 2)
@@ -56,16 +67,28 @@ function Player:update (dt)
   if (controls:isActionDown("DOWN")) then
     y_vel = y_vel + speed
   end
+  if (x_vel ~= 0 or y_vel ~= 0) then
+    if (x_vel > 0) then
+      self.current_direction = 'right'
+    elseif (x_vel < 0) then
+      self.current_direction = 'left'
+    end
+    self.current_anim = 'run'
+  else
+    self.current_anim = 'idle'
+  end
   self.physics.body:setLinearVelocity(x_vel, y_vel)
   if (controls:isActionDown("INTERACT")) then
     self.health = math.max(self.health - 1, 0)
   end
   self.x = self.physics.body:getX();
   self.y = self.physics.body:getY();
+  self.animations[self.current_anim].anim:update(dt)
 end
 
 function Player:draw ()
-  love.graphics.draw(self.sprite, math.floor(self.x), math.floor(self.y), 0, 1, 1, self.size / 2, self.size / 2)
+  local direction_modifier = self.current_direction == 'right' and 1 or -1
+  self.animations[self.current_anim].anim:draw(self.animations[self.current_anim].sprites, self.x, self.y, 0, direction_modifier, 1, self.size / 2, self.size / 2)
 end
 
 return Player
