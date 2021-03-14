@@ -10,6 +10,11 @@ local hud
 local camera
 local canvas
 
+GRID_SIZE = 16
+CANVAS_WIDTH = GRID_SIZE * 20
+CANVAS_HEIGHT = GRID_SIZE * 16
+CANVAS_SCALE = 4
+
 function BeginContact (a, b, coll)
   local a_data = a:getUserData()
   local b_data = b:getUserData()
@@ -20,15 +25,20 @@ end
 
 function love.load ()
   love.window.setTitle("DeckGame v0.0.1")
-  camera = Camera(200, 150, 400, 300)
-  camera:setFollowStyle('TOPDOWN_TIGHT')
-  canvas = love.graphics.newCanvas(400, 300)
+
   love.graphics.setDefaultFilter('nearest', 'nearest')
   love.physics.setMeter(16)
 	world = love.physics.newWorld(0, 0)
   world:setCallbacks(BeginContact)
   map = sti("assets/dungeon.lua", { "box2d" })
 	map:box2d_init(world)
+
+  love.window.setMode(CANVAS_WIDTH * CANVAS_SCALE, CANVAS_HEIGHT * CANVAS_SCALE)
+  canvas = love.graphics.newCanvas(CANVAS_WIDTH, CANVAS_HEIGHT)
+  camera = Camera(CANVAS_WIDTH / 2, CANVAS_HEIGHT /2, CANVAS_WIDTH, CANVAS_HEIGHT)
+  camera:setBounds(0, 0, map.width * map.tilewidth, map.height * map.tileheight)
+  camera:setFollowStyle('TOPDOWN_TIGHT')
+  camera:setFollowLerp(0.1)
 
   -- Find player spawn point
   local gameObjects = map.layers["GameObjects"]
@@ -93,20 +103,17 @@ function love.update(dt)
 end
 
 function love.draw()
-  camera:attach()
   love.graphics.setCanvas(canvas)
   love.graphics.clear()
-  love.graphics.setColor(1, 1, 1)
-  map:draw(0, 0)
-  -- Uncommit to view collision debug
-  -- love.graphics.setColor(1, 0, 0)
-	-- map:box2d_draw(0, 0)
-
+  camera:attach()
+  love.graphics.setColor({255, 255, 255, 1})
+  map:draw(math.floor(-camera.x + CANVAS_WIDTH / 2), math.floor(-camera.y + CANVAS_HEIGHT / 2))
+  camera:detach()
+  camera:draw()
   love.graphics.setCanvas()
   love.graphics.setColor(1, 1, 1, 1)
   love.graphics.setBlendMode('alpha', 'premultiplied')
-  love.graphics.draw(canvas, 0, 0, 0, 2, 2)
+  love.graphics.draw(canvas, 0, 0, 0, CANVAS_SCALE, CANVAS_SCALE)
   love.graphics.setBlendMode('alpha')
-  camera:detach()
   hud:draw()
 end
