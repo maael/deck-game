@@ -1,6 +1,5 @@
 local anim8 = require("vendor.anim8")
 local Inventory = require("inventory")
-local player = require "player"
 local Enemy = {}
 Enemy.__index = Enemy
 
@@ -56,8 +55,7 @@ function Enemy:handlePickup (item)
 end
 
 function Enemy:handleCollidePlayer (player)
-  -- TODO: Doesn't seem to trigger consistently when the enemy is hunting us
-  player:setHealth(-10)
+  player:setHealth(-1)
 end
 
 function Enemy:update (dt)
@@ -66,6 +64,16 @@ function Enemy:update (dt)
   self:checkPlayerVisibility()
   local x_vel = 0
   local y_vel = 0
+
+  local contacts = self.physics.body:getContacts()
+
+  for _, contact in pairs(contacts) do
+    local a, b = contact:getFixtures()
+    local a_data = a:getUserData()
+    if (a_data.is_player) then
+      self:handleCollidePlayer(a_data)
+    end
+  end
 
   if (self.can_see_player) then
     -- TODO: Using the player_normal values seems whack
@@ -153,6 +161,8 @@ function Enemy:draw ()
     if (self.intersect_x and self.intersect_y) then
       love.graphics.line(self.x, self.y, self.intersect_x, self.intersect_y)
     end
+    love.graphics.setColor(255, 0, 0, 1);
+    love.graphics.polygon("line", self.physics.body:getWorldPoints(self.physics.shape:getPoints()))
   end
 end
 

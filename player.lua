@@ -24,7 +24,8 @@ function Player.new (world, player_spawn)
     animations = {},
     current_direction = 'right',
     current_anim = 'idle',
-    is_dead = false
+    is_dead = false,
+    debug = false
   }
   local idle_spritesheet = love.graphics.newImage('assets/spritesheets/knight_idle_spritesheet.png')
   local idle_grid = anim8.newGrid(16, 16, idle_spritesheet:getWidth(), idle_spritesheet:getHeight())
@@ -99,6 +100,10 @@ end
 function Player:draw ()
   local direction_modifier = self.current_direction == 'right' and 1 or -1
   self.animations[self.current_anim].anim:draw(self.animations[self.current_anim].sprites, self.x, self.y, 0, direction_modifier, 1, self.size / 2, self.size / 2)
+  if (self.debug) then
+    love.graphics.setColor(255, 0, 0, 1);
+    love.graphics.polygon("line", self.physics.body:getWorldPoints(self.physics.shape:getPoints()))
+  end
 end
 
 return Player

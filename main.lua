@@ -14,7 +14,7 @@ local canvas
 GRID_SIZE = 16
 CANVAS_WIDTH = GRID_SIZE * 20
 CANVAS_HEIGHT = GRID_SIZE * 16
-CANVAS_SCALE = 4
+CANVAS_SCALE = 3
 
 function BeginContact (a, b, coll)
   local a_data = a:getUserData()
