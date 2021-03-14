@@ -1,5 +1,6 @@
 local sti = require "vendor/sti"
 local Camera = require 'vendor/STALKER-X/camera'
+local fpsGraph = require 'vendor/FPSGraph'
 local controls = require "controls".get("player")
 local HUD = require "hud"
 local Player = require "player"
@@ -10,6 +11,7 @@ local player
 local hud
 local camera
 local canvas
+local graph
 
 GRID_SIZE = 16
 CANVAS_WIDTH = GRID_SIZE * 20
@@ -30,6 +32,8 @@ end
 
 function love.load ()
   love.window.setTitle("DeckGame v0.0.1")
+
+  graph = fpsGraph.createGraph(10, 50)
 
   love.graphics.setDefaultFilter('nearest', 'nearest')
   love.physics.setMeter(16)
@@ -107,6 +111,7 @@ function love.update(dt)
   controls:update(dt)
   camera:update(dt)
   camera:follow(player.x, player.y)
+  fpsGraph.updateFPS(graph, dt)
 end
 
 function love.draw()
@@ -133,4 +138,5 @@ function love.draw()
     love.graphics.printf({{1, 0, 0},"YOU DIED", {0, 0, 0}}, 0, (CANVAS_HEIGHT * CANVAS_SCALE) / 2, (CANVAS_WIDTH * CANVAS_SCALE), "center")
   end
   hud:draw(canvas, CANVAS_WIDTH, CANVAS_SCALE)
+  fpsGraph.drawGraphs({graph})
 end
