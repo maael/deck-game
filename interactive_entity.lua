@@ -1,18 +1,15 @@
 local InteractiveEntity = {}
 InteractiveEntity.__index = InteractiveEntity
 
-function InteractiveEntity.new (world, x, y, object_type, item_type, tile_set_img, sprite_batch)
+function InteractiveEntity.new (world, x, y, object_type, item_type, tile_set_img)
   local color = {191, 191, 191, 1}
   local sprite_quad = nil
-  local sprite = nil
   if (item_type == "heal_potion") then
     color = {255, 0, 0, 0.5}
     sprite_quad = love.graphics.newQuad(7 * 16, 0 * 16, 16, 16, tile_set_img:getWidth(), tile_set_img:getHeight())
-    sprite = sprite_batch:add(sprite_quad, x, y - 16, 0, 2, 2)
   elseif (item_type == "key") then
     color = {0,255,0,0.5}
     sprite_quad = love.graphics.newQuad(5 * 16, 0 * 16, 16, 16, tile_set_img:getWidth(), tile_set_img:getHeight())
-    sprite = sprite_batch:add(sprite_quad, x, y - 16, 0, 2, 2)
   else
     color = {0, 0, 255, 0.5}
   end
@@ -27,12 +24,11 @@ function InteractiveEntity.new (world, x, y, object_type, item_type, tile_set_im
     object_type = object_type,
     item_type = item_type,
     color = color,
-    sprite = sprite,
     sprite_quad = sprite_quad,
-    sprite_batch = sprite_batch,
     physics = {},
     debug = false,
-    is_active = true
+    is_active = true,
+    tile_set_img = tile_set_img
   }
   interactive_entity.physics.body = love.physics.newBody(world, interactive_entity.x + 8, interactive_entity.y + 8, "static")
   interactive_entity.physics.shape = love.physics.newRectangleShape(0, 0, interactive_entity.size,interactive_entity.size)
@@ -55,26 +51,24 @@ end
 
 function InteractiveEntity:onPickup(player)
   self.is_active = false
-  if (self.sprite_batch and self.sprite) then
-    self.sprite_batch:set(self.sprite, 0, 0, 0, 0, 0)
-  end
   player:handlePickup(self)
 end
 
 function InteractiveEntity:draw ()
   if (self.object_type == "pickup_item") then
-    love.graphics.setColor({0, 0, 0, 0.5})
-    if (self.debug) then
-      love.graphics.polygon("line", self.physics.body:getWorldPoints(self.physics.shape:getPoints()))
-    end
-    local shadow_width = 4 + self.bounce_height - (self.base_y - self.y)
-    love.graphics.ellipse( "fill", self.x + 8, self.base_y + 16, shadow_width, 2)
-    if (self.sprite and self.sprite_quad and self.sprite_batch) then
-      self.sprite_batch:set(self.sprite, self.sprite_quad, self.x * 2, self.y * 2, 0, 2, 2)
+    if (self.tile_set_img and self.sprite_quad) then
+      love.graphics.setColor({255, 255, 255, 1})
+      love.graphics.draw(self.tile_set_img, self.sprite_quad, self.x, self.y)
     else
       love.graphics.setColor(self.color)
       love.graphics.rectangle( "fill", self.x, self.y, 16, 16)
     end
+    if (self.debug) then
+      love.graphics.polygon("line", self.physics.body:getWorldPoints(self.physics.shape:getPoints()))
+    end
+    love.graphics.setColor({0, 0, 0, 0.5})
+    local shadow_width = 4 + self.bounce_height - (self.base_y - self.y)
+    love.graphics.ellipse( "fill", self.x + 8, self.base_y + 16, shadow_width, 2)
   else
     love.graphics.setColor(self.color)
     love.graphics.rectangle( "fill", self.x, self.y, 16, 16)

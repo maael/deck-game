@@ -55,10 +55,10 @@ Some free placeholders currently from [itch.io](https://itch.io).
 - [x] Interactive items from Tiled maps data
 - [x] Basic player movement and collisions with maps
 - [x] Allow players to pickup/interact with items placed in Tiled maps
-- [ ] Camera system
+- [x] Camera system
   - [Gamera](https://github.com/kikito/gamera)
   - [Hump](https://github.com/HDictus/hump/tree/temp-master) - includes other things
-  - [STALKER-X](https://github.com/a327ex/STALKER-X)
+  - [STALKER-X](https://github.com/a327ex/STALKER-X) - I went with this one
 - [ ] Fog of war/visibility system
 - [ ] Player animations
 - [ ] Player inventory system

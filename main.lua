@@ -1,4 +1,5 @@
 local sti = require "vendor/sti"
+local Camera = require 'vendor/STALKER-X/camera'
 local controls = require "controls".get("player")
 local HUD = require "hud"
 local Player = require "player"
@@ -6,7 +7,8 @@ local InteractiveEntity = require "interactive_entity"
 
 local player
 local hud
-local item_sprite_batch
+local camera
+local canvas
 
 function BeginContact (a, b, coll)
   local a_data = a:getUserData()
@@ -18,6 +20,9 @@ end
 
 function love.load ()
   love.window.setTitle("DeckGame v0.0.1")
+  camera = Camera(200, 150, 400, 300)
+  camera:setFollowStyle('TOPDOWN_TIGHT')
+  canvas = love.graphics.newCanvas(400, 300)
   love.graphics.setDefaultFilter('nearest', 'nearest')
   love.physics.setMeter(16)
 	world = love.physics.newWorld(0, 0)
@@ -61,12 +66,11 @@ function love.load ()
 
   -- Process game objects
   local tile_set_img = love.graphics.newImage("assets/dungeon_tiles.png")
-  item_sprite_batch = love.graphics.newSpriteBatch(tile_set_img)
 
   local gameObjects = map.layers["GameObjects"]
   for _, object in pairs(gameObjects.objects) do
     if object.properties.object_type ~= nil and object.properties.object_type ~= "player_spawn" then
-      table.insert(spriteLayer.sprites, InteractiveEntity.new(world, object.x, object.y, object.properties.object_type, object.properties.item_type, tile_set_img, item_sprite_batch))
+      table.insert(spriteLayer.sprites, InteractiveEntity.new(world, object.x, object.y, object.properties.object_type, object.properties.item_type, tile_set_img))
     end
   end
   map:removeLayer("GameObjects")
@@ -84,14 +88,25 @@ function love.update(dt)
   world:update(dt)
   map:update(dt)
   controls:update(dt)
+  camera:update(dt)
+  camera:follow(player.x, player.y)
 end
 
 function love.draw()
+  camera:attach()
+  love.graphics.setCanvas(canvas)
+  love.graphics.clear()
   love.graphics.setColor(1, 1, 1)
-  map:draw(0, 0, 2, 2)
-  love.graphics.draw(item_sprite_batch)
+  map:draw(0, 0)
   -- Uncommit to view collision debug
   -- love.graphics.setColor(1, 0, 0)
-	-- map:box2d_draw(0, 0, 2, 2)
+	-- map:box2d_draw(0, 0)
+
+  love.graphics.setCanvas()
+  love.graphics.setColor(1, 1, 1, 1)
+  love.graphics.setBlendMode('alpha', 'premultiplied')
+  love.graphics.draw(canvas, 0, 0, 0, 2, 2)
+  love.graphics.setBlendMode('alpha')
+  camera:detach()
   hud:draw()
 end
