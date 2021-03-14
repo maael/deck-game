@@ -9,7 +9,7 @@ return {
   tilewidth = 16,
   tileheight = 16,
   nextlayerid = 7,
-  nextobjectid = 51,
+  nextobjectid = 53,
   properties = {},
   tilesets = {
     {
@@ -555,6 +555,36 @@ return {
             ["item_type"] = "heal_potion",
             ["object_type"] = "pickup_item",
             ["sensor"] = true
+          }
+        },
+        {
+          id = 51,
+          name = "",
+          type = "",
+          shape = "rectangle",
+          x = 243,
+          y = 156.667,
+          width = 0,
+          height = 0,
+          rotation = 0,
+          visible = false,
+          properties = {
+            ["object_type"] = "enemy_spawn"
+          }
+        },
+        {
+          id = 52,
+          name = "",
+          type = "",
+          shape = "rectangle",
+          x = 448.333,
+          y = 148.667,
+          width = 0,
+          height = 0,
+          rotation = 0,
+          visible = false,
+          properties = {
+            ["object_type"] = "enemy_spawn"
           }
         }
       }

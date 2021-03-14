@@ -3,6 +3,7 @@ local Camera = require 'vendor/STALKER-X/camera'
 local controls = require "controls".get("player")
 local HUD = require "hud"
 local Player = require "player"
+local Enemy = require "enemy"
 local InteractiveEntity = require "interactive_entity"
 
 local player
@@ -18,8 +19,12 @@ CANVAS_SCALE = 4
 function BeginContact (a, b, coll)
   local a_data = a:getUserData()
   local b_data = b:getUserData()
-  if (a_data.is_player and b_data.onPickup) then
-    b_data:onPickup(a_data)
+  if (a_data.is_player) then
+    if (b_data.handleCollidePlayer) then
+      b_data:handleCollidePlayer(a_data)
+    elseif (b_data.onPickup) then
+      b_data:onPickup(a_data)
+    end
   end
 end
 
@@ -79,7 +84,9 @@ function love.load ()
 
   local gameObjects = map.layers["GameObjects"]
   for _, object in pairs(gameObjects.objects) do
-    if object.properties.object_type ~= nil and object.properties.object_type ~= "player_spawn" then
+    if object.properties.object_type ~= nil and object.properties.object_type == "enemy_spawn" then
+      table.insert(spriteLayer.sprites, Enemy.new(world, {x = object.x, y= object.y}))
+    elseif object.properties.object_type ~= nil and object.properties.object_type ~= "player_spawn" then
       table.insert(spriteLayer.sprites, InteractiveEntity.new(world, object.x, object.y, object.properties.object_type, object.properties.item_type, tile_set_img))
     end
   end
@@ -115,5 +122,12 @@ function love.draw()
   love.graphics.setBlendMode('alpha', 'premultiplied')
   love.graphics.draw(canvas, 0, 0, 0, CANVAS_SCALE, CANVAS_SCALE)
   love.graphics.setBlendMode('alpha')
+  if (player.is_dead) then
+    love.graphics.setColor(0, 0, 0, 0.6)
+    love.graphics.rectangle("fill", 0, 0, CANVAS_WIDTH * CANVAS_SCALE, CANVAS_HEIGHT * CANVAS_SCALE)
+    love.graphics.setColor(255, 0, 0, 1)
+    love.graphics.setFont(love.graphics.newFont(32))
+    love.graphics.printf({{1, 0, 0},"YOU DIED", {0, 0, 0}}, 0, (CANVAS_HEIGHT * CANVAS_SCALE) / 2, (CANVAS_WIDTH * CANVAS_SCALE), "center")
+  end
   hud:draw()
 end

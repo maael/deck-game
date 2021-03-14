@@ -6,6 +6,7 @@ Player.__index = Player
 
 function Player.new (world, player_spawn)
   local player = {
+    name = "Player",
     is_player = true,
     health = 100,
     x = player_spawn.x,
@@ -23,6 +24,7 @@ function Player.new (world, player_spawn)
     animations = {},
     current_direction = 'right',
     current_anim = 'idle',
+    is_dead = false
   }
   local idle_spritesheet = love.graphics.newImage('assets/spritesheets/knight_idle_spritesheet.png')
   local idle_grid = anim8.newGrid(16, 16, idle_spritesheet:getWidth(), idle_spritesheet:getHeight())
@@ -44,9 +46,17 @@ function Player.new (world, player_spawn)
   return player
 end
 
+function Player:setHealth(modifier)
+  self.health = math.max(math.min(self.health + modifier, 100), 0)
+  if (self.health == 0) then
+    self.is_dead = true
+    self.is_active = false
+  end
+end
+
 function Player:handlePickup (item)
   if (item.item_type == "heal_potion") then
-    self.health = math.min(self.health + 20, 100)
+    self:setHealth(20)
   end
 end
 
@@ -79,7 +89,7 @@ function Player:update (dt)
   end
   self.physics.body:setLinearVelocity(x_vel, y_vel)
   if (controls:isActionDown("INTERACT")) then
-    self.health = math.max(self.health - 1, 0)
+    self:setHealth(-1)
   end
   self.x = self.physics.body:getX();
   self.y = self.physics.body:getY();
