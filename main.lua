@@ -31,8 +31,6 @@ function BeginContact (a, b, coll)
 end
 
 function love.load ()
-  love.window.setTitle("DeckGame v0.0.1")
-
   graph = fpsGraph.createGraph(10, 50)
 
   love.graphics.setDefaultFilter('nearest', 'nearest')
@@ -106,6 +104,7 @@ function love.gamepadpressed (key)
 end
 
 function love.update(dt)
+  love.window.setTitle("DeckGame v0.0.1 (FPS: "..love.timer.getFPS()..")")
   world:update(dt)
   map:update(dt)
   controls:update(dt)
