@@ -132,5 +132,5 @@ function love.draw()
     love.graphics.setFont(love.graphics.newFont(32))
     love.graphics.printf({{1, 0, 0},"YOU DIED", {0, 0, 0}}, 0, (CANVAS_HEIGHT * CANVAS_SCALE) / 2, (CANVAS_WIDTH * CANVAS_SCALE), "center")
   end
-  hud:draw()
+  hud:draw(canvas, CANVAS_WIDTH, CANVAS_SCALE)
 end
