@@ -44,6 +44,9 @@ The used vendor plugins are in `./vendor`. Any alterations that have been made w
 - [LÖVE](https://www.love2d.org/)
   - [Tiled](https://www.mapeditor.org/)
   - [Simple Tiled Implementation](https://github.com/karai17/Simple-Tiled-Implementation)
+  - [FPSGraph](https://github.com/icrawler/FPSGraph)
+  - [Anim8](https://github.com/kikito/anim8)
+  - [STALKER-X](https://github.com/a327ex/STALKER-X)
 
 ## Assets
 
