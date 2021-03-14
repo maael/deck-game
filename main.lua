@@ -85,7 +85,7 @@ function love.load ()
   local gameObjects = map.layers["GameObjects"]
   for _, object in pairs(gameObjects.objects) do
     if object.properties.object_type ~= nil and object.properties.object_type == "enemy_spawn" then
-      table.insert(spriteLayer.sprites, Enemy.new(world, {x = object.x, y= object.y}))
+      table.insert(spriteLayer.sprites, Enemy.new(world, {x = object.x, y= object.y}, player))
     elseif object.properties.object_type ~= nil and object.properties.object_type ~= "player_spawn" then
       table.insert(spriteLayer.sprites, InteractiveEntity.new(world, object.x, object.y, object.properties.object_type, object.properties.item_type, tile_set_img))
     end
@@ -115,6 +115,9 @@ function love.draw()
   camera:attach()
   love.graphics.setColor({255, 255, 255, 1})
   map:draw(math.floor(-camera.x + CANVAS_WIDTH / 2), math.floor(-camera.y + CANVAS_HEIGHT / 2))
+  -- love.graphics.setColor({255, 0, 0, 1})
+  -- map:box2d_draw()
+  -- love.graphics.setColor({255, 255, 255, 1})
   camera:detach()
   camera:draw()
   love.graphics.setCanvas()
