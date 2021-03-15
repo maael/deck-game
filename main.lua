@@ -126,12 +126,8 @@ function love.draw()
   love.graphics.draw(canvas, 0, 0, 0, CANVAS_SCALE, CANVAS_SCALE)
   love.graphics.setBlendMode('alpha')
   if (player.is_dead) then
-    love.graphics.setColor(0, 0, 0, 0.6)
-    love.graphics.rectangle("fill", 0, 0, CANVAS_WIDTH * CANVAS_SCALE, CANVAS_HEIGHT * CANVAS_SCALE)
-    love.graphics.setColor(255, 0, 0, 1)
-    love.graphics.setFont(love.graphics.newFont(32))
-    love.graphics.printf({{1, 0, 0},"YOU DIED", {0, 0, 0}}, 0, (CANVAS_HEIGHT * CANVAS_SCALE) / 2, (CANVAS_WIDTH * CANVAS_SCALE), "center")
+    hud:drawDeathScreen()
   end
-  hud:draw(canvas, CANVAS_WIDTH, CANVAS_SCALE)
+  hud:draw(canvas)
   fpsGraph.drawGraphs({graph})
 end
