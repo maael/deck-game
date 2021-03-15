@@ -97,6 +97,8 @@ function love.load ()
   for _, object in pairs(persistentGameObjects.objects) do
     if object.properties.lootable then
       table.insert(spriteLayer.sprites, LootableContainer.new(world, object.x, object.y, tile_set_img, tile_set_grid, spriteLayer.sprites))
+    else
+      table.insert(spriteLayer.sprites, InteractiveEntity.new(world, object.x, object.y, object.properties.object_type, object.properties.item_type, tile_set_img, tile_set_grid))
     end
   end
 end
