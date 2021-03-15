@@ -1,3 +1,4 @@
+require "globals"
 local sti = require "vendor/sti"
 local Camera = require 'vendor/STALKER-X/camera'
 local fpsGraph = require 'vendor/FPSGraph'
@@ -12,11 +13,6 @@ local hud
 local camera
 local canvas
 local graph
-
-GRID_SIZE = 16
-CANVAS_WIDTH = GRID_SIZE * 20
-CANVAS_HEIGHT = GRID_SIZE * 16
-CANVAS_SCALE = 3
 
 function BeginContact (a, b, coll)
   local a_data = a:getUserData()
@@ -34,7 +30,7 @@ function love.load ()
   graph = fpsGraph.createGraph(10, 50)
 
   love.graphics.setDefaultFilter('nearest', 'nearest')
-  love.physics.setMeter(16)
+  love.physics.setMeter(GRID_SIZE)
 	world = love.physics.newWorld(0, 0)
   world:setCallbacks(BeginContact)
   map = sti("assets/dungeon.lua", { "box2d" })

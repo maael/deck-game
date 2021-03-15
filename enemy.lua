@@ -9,7 +9,7 @@ function Enemy.new (world, enemy_spawn, player)
     health = 100,
     x = enemy_spawn.x,
     y = enemy_spawn.y,
-    size = 16,
+    size = GRID_SIZE,
     speed = 50,
     sprint_speed = 100,
     sprinting = false,
@@ -32,11 +32,11 @@ function Enemy.new (world, enemy_spawn, player)
     player_normal_y = nil
   }
   local idle_spritesheet = love.graphics.newImage('assets/spritesheets/goblin_idle_spritesheet.png')
-  local idle_grid = anim8.newGrid(16, 16, idle_spritesheet:getWidth(), idle_spritesheet:getHeight())
+  local idle_grid = anim8.newGrid(GRID_SIZE, GRID_SIZE, idle_spritesheet:getWidth(), idle_spritesheet:getHeight())
   local idle_animation = anim8.newAnimation(idle_grid('1-6', 1), 0.2)
   enemy.animations.idle = {anim = idle_animation, sprites = idle_spritesheet}
   local run_spritesheet = love.graphics.newImage('assets/spritesheets/goblin_run_spritesheet.png')
-  local run_grid = anim8.newGrid(16, 16, run_spritesheet:getWidth(), run_spritesheet:getHeight())
+  local run_grid = anim8.newGrid(GRID_SIZE, GRID_SIZE, run_spritesheet:getWidth(), run_spritesheet:getHeight())
   local run_animation = anim8.newAnimation(run_grid('1-6', 1), 0.2)
   enemy.animations.run = {anim = run_animation, sprites = run_spritesheet}
   setmetatable(enemy, Enemy)

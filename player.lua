@@ -11,7 +11,7 @@ function Player.new (world, player_spawn)
     health = 100,
     x = player_spawn.x,
     y = player_spawn.y,
-    size = 16,
+    size = GRID_SIZE,
     speed = 128,
     sprint_speed = 200,
     sprinting = false,
@@ -28,11 +28,11 @@ function Player.new (world, player_spawn)
     debug = false
   }
   local idle_spritesheet = love.graphics.newImage('assets/spritesheets/knight_idle_spritesheet.png')
-  local idle_grid = anim8.newGrid(16, 16, idle_spritesheet:getWidth(), idle_spritesheet:getHeight())
+  local idle_grid = anim8.newGrid(GRID_SIZE, GRID_SIZE, idle_spritesheet:getWidth(), idle_spritesheet:getHeight())
   local idle_animation = anim8.newAnimation(idle_grid('1-6', 1), 0.2)
   player.animations.idle = {anim = idle_animation, sprites = idle_spritesheet}
   local run_spritesheet = love.graphics.newImage('assets/spritesheets/knight_run_spritesheet.png')
-  local run_grid = anim8.newGrid(16, 16, run_spritesheet:getWidth(), run_spritesheet:getHeight())
+  local run_grid = anim8.newGrid(GRID_SIZE, GRID_SIZE, run_spritesheet:getWidth(), run_spritesheet:getHeight())
   local run_animation = anim8.newAnimation(run_grid('1-6', 1), 0.2)
   player.animations.run = {anim = run_animation, sprites = run_spritesheet}
   setmetatable(player, Player)
