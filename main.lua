@@ -6,6 +6,7 @@ local fpsGraph = require 'vendor/FPSGraph'
 local controls = require'controls'.get('player')
 local HUD = require 'hud'
 local Player = require 'player'
+local PlayerMenu = require 'player_menu'
 local Enemy = require 'enemy'
 local InteractiveEntity = require 'interactive_entity'
 local LootableContainer = require 'lootable_container'
@@ -15,6 +16,7 @@ local hud
 local camera
 local canvas
 local graph
+local player_menu
 
 function BeginContact(a, b, coll)
   local a_data = a:getUserData()
@@ -29,7 +31,7 @@ function BeginContact(a, b, coll)
 end
 
 function love.load()
-  graph = fpsGraph.createGraph(10, 50)
+  graph = fpsGraph.createGraph(10, 50, 50, 30, 0.5, false)
 
   love.graphics.setDefaultFilter('nearest', 'nearest')
   love.physics.setMeter(GRID_SIZE)
@@ -56,7 +58,8 @@ function love.load()
     end
   end
 
-  player = Player.new(world, player_spawn)
+  player = Player.new(world, player_spawn, map)
+  player_menu = PlayerMenu.new(player)
   hud = HUD.new(player)
 
   -- Add Player to custom layer in map
@@ -109,19 +112,25 @@ end
 
 function love.keypressed(key)
   controls:handlePressed('keyboard', key)
+  player_menu.controls:handlePressed('keyboard', key)
 end
 
 function love.gamepadpressed(key)
   controls:handlePressed('gamepad', key)
+  player_menu.controls:handlePressed('gamepad', key)
 end
 
 function love.update(dt)
   love.window.setTitle('DeckGame v0.0.1 (FPS: ' .. love.timer.getFPS() .. ')')
-  world:update(dt)
-  map:update(dt)
-  controls:update(dt)
-  camera:update(dt)
-  camera:follow(player.x, player.y)
+  player_menu:update(dt)
+  player_menu.controls:update(dt)
+  if (not player_menu.is_open) then
+    world:update(dt)
+    map:update(dt)
+    controls:update(dt)
+    camera:update(dt)
+    camera:follow(player.x, player.y)
+  end
   fpsGraph.updateFPS(graph, dt)
 end
 
@@ -131,6 +140,7 @@ function love.draw()
   camera:attach()
   love.graphics.setColor({255, 255, 255, 1})
   map:draw(math.floor(-camera.x + CANVAS_WIDTH / 2), math.floor(-camera.y + CANVAS_HEIGHT / 2))
+  player_menu:draw()
   -- love.graphics.setColor({255, 0, 0, 1})
   -- map:box2d_draw()
   -- love.graphics.setColor({255, 255, 255, 1})

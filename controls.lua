@@ -6,6 +6,7 @@ local actions = {
   interact = 'INTERACT',
   sprint = 'SPRINT',
   escape = 'ESCAPE',
+  select = "SELECT",
 }
 
 local keyboard_map = {
@@ -17,6 +18,7 @@ local keyboard_map = {
   e = actions.interact,
   escape = actions.escape,
   q = actions.escape,
+  ['return'] = actions.select,
 }
 
 local gamepad_map = {
@@ -27,6 +29,7 @@ local gamepad_map = {
   leftshoulder = actions.sprint,
   a = actions.interact,
   select = actions.escape,
+  ['return'] = actions.select,
 }
 
 local InputController = {}
@@ -40,6 +43,7 @@ function InputController.new(name)
   controller.actions = actions
   controller.action_map = {}
   controller.release_action_map = {}
+  controller.down_action_map = {}
   controller.type = 'keyboard'
   controller.wasDown = {}
   return controller
@@ -74,6 +78,8 @@ end
 function InputController:addAction(action, fn, type)
   if type == 'release' then
     self.release_action_map[action] = fn
+  elseif type == 'down' then
+    self.down_action_map[action] = fn
   else
     self.action_map[action] = fn
   end
@@ -112,12 +118,17 @@ function InputController:update(dt)
     if (love.keyboard.isDown(key)) then
       if not self:wasKeyDown(key, false) then
         table.insert(self.wasDown, key)
+        if (self.down_action_map[action]) then
+          self.down_action_map[action](dt)
+        end
       end
       if (self.action_map[action]) then
         self.action_map[action](dt)
       end
     elseif self.release_action_map[action] and self:wasKeyDown(key, true) then
       self.release_action_map[action](dt)
+    else
+      self:wasKeyDown(key, true)
     end
   end
 end

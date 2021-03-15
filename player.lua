@@ -4,7 +4,7 @@ local Inventory = require('inventory')
 local Player = {}
 Player.__index = Player
 
-function Player.new(world, player_spawn)
+function Player.new(world, player_spawn, map)
   local player = {
     name = 'Player',
     is_player = true,
@@ -27,6 +27,7 @@ function Player.new(world, player_spawn)
     is_dead = false,
     debug = false,
     invulnerabe = true,
+    map = map
   }
   local idle_spritesheet = love.graphics.newImage('assets/spritesheets/knight_idle_spritesheet.png')
   local idle_grid = anim8.newGrid(GRID_SIZE, GRID_SIZE, idle_spritesheet:getWidth(), idle_spritesheet:getHeight())
@@ -42,9 +43,6 @@ function Player.new(world, player_spawn)
   player.physics.fixture = love.physics.newFixture(player.physics.body, player.physics.shape)
   player.physics.body:setFixedRotation(true)
   player.physics.fixture:setUserData(player)
-  controls:addAction('ESCAPE', function()
-    love.event.quit()
-  end)
   return player
 end
 

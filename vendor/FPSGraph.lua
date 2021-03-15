@@ -63,22 +63,6 @@ function fpsGraph.updateGraph(graph, val, label, dt)
 	-- get mouse position
 	local mouseX, mouseY = love.mouse.getPosition()
 
-	-- code for draggable graphs
-	if graph.draggable then
-		if (mouseX < graph.width+graph.x and mouseX > graph.x and
-		   mouseY < graph.height+graph.y and mouseY > graph.y) or graph._isDown then
-			if love.mouse.isDown("l") then
-				graph._isDown = true
-				graph.x = mouseX - graph._dx
-				graph.y = mouseY - graph._dy
-			else
-				graph._isDown = false
-				graph._dx = mouseX - graph.x
-				graph._dy = mouseY - graph.y
-			end
-		end
-	end
-
 	-- when current time is bigger than the delay
 	while graph.cur_time >= graph.delay do
 		-- subtract current time by delay
