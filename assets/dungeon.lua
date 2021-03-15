@@ -490,6 +490,98 @@ return {
     {
       type = "objectgroup",
       draworder = "topdown",
+      id = 4,
+      name = "CollidableObjects",
+      visible = true,
+      opacity = 1,
+      offsetx = 0,
+      offsety = 0,
+      properties = {},
+      objects = {
+        {
+          id = 35,
+          name = "",
+          type = "",
+          shape = "rectangle",
+          x = 208.685,
+          y = 110.768,
+          width = 16,
+          height = 16,
+          rotation = 0,
+          gid = 11,
+          visible = true,
+          properties = {
+            ["collidable"] = true,
+            ["static"] = true
+          }
+        },
+        {
+          id = 36,
+          name = "",
+          type = "",
+          shape = "rectangle",
+          x = 193.143,
+          y = 110.768,
+          width = 16,
+          height = 16,
+          rotation = 0,
+          gid = 10,
+          visible = true,
+          properties = {
+            ["collidable"] = true,
+            ["static"] = true
+          }
+        },
+        {
+          id = 37,
+          name = "",
+          type = "",
+          shape = "rectangle",
+          x = 479.667,
+          y = 142.333,
+          width = 16,
+          height = 16,
+          rotation = 0,
+          gid = 15,
+          visible = true,
+          properties = {
+            ["collidable"] = true,
+            ["static"] = true
+          }
+        },
+        {
+          id = 49,
+          name = "",
+          type = "",
+          shape = "rectangle",
+          x = 422.333,
+          y = 96.6667,
+          width = 16,
+          height = 16,
+          rotation = 0,
+          gid = 5,
+          visible = true,
+          properties = {}
+        },
+        {
+          id = 50,
+          name = "",
+          type = "",
+          shape = "rectangle",
+          x = 520.667,
+          y = 96.3333,
+          width = 16,
+          height = 16,
+          rotation = 0,
+          gid = 5,
+          visible = true,
+          properties = {}
+        }
+      }
+    },
+    {
+      type = "objectgroup",
+      draworder = "topdown",
       id = 6,
       name = "GameObjects",
       visible = true,
@@ -719,98 +811,6 @@ return {
             ["object_type"] = "stairs",
             ["sensor"] = true
           }
-        }
-      }
-    },
-    {
-      type = "objectgroup",
-      draworder = "topdown",
-      id = 4,
-      name = "CollidableObjects",
-      visible = true,
-      opacity = 1,
-      offsetx = 0,
-      offsety = 0,
-      properties = {},
-      objects = {
-        {
-          id = 35,
-          name = "",
-          type = "",
-          shape = "rectangle",
-          x = 208.685,
-          y = 110.768,
-          width = 16,
-          height = 16,
-          rotation = 0,
-          gid = 11,
-          visible = true,
-          properties = {
-            ["collidable"] = true,
-            ["static"] = true
-          }
-        },
-        {
-          id = 36,
-          name = "",
-          type = "",
-          shape = "rectangle",
-          x = 193.143,
-          y = 110.768,
-          width = 16,
-          height = 16,
-          rotation = 0,
-          gid = 10,
-          visible = true,
-          properties = {
-            ["collidable"] = true,
-            ["static"] = true
-          }
-        },
-        {
-          id = 37,
-          name = "",
-          type = "",
-          shape = "rectangle",
-          x = 479.667,
-          y = 142.333,
-          width = 16,
-          height = 16,
-          rotation = 0,
-          gid = 15,
-          visible = true,
-          properties = {
-            ["collidable"] = true,
-            ["static"] = true
-          }
-        },
-        {
-          id = 49,
-          name = "",
-          type = "",
-          shape = "rectangle",
-          x = 422.333,
-          y = 96.6667,
-          width = 16,
-          height = 16,
-          rotation = 0,
-          gid = 5,
-          visible = true,
-          properties = {}
-        },
-        {
-          id = 50,
-          name = "",
-          type = "",
-          shape = "rectangle",
-          x = 520.667,
-          y = 96.3333,
-          width = 16,
-          height = 16,
-          rotation = 0,
-          gid = 5,
-          visible = true,
-          properties = {}
         }
       }
     },

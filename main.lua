@@ -62,7 +62,7 @@ function love.load ()
 
   -- Add Player to custom layer in map
   -- This is the secret sauce that makes collisions work properly
-  map:addCustomLayer("Sprites", 6)
+  map:addCustomLayer("Sprites", 7)
 	local spriteLayer = map.layers["Sprites"]
 	spriteLayer.sprites = { player }
 	function spriteLayer:update(dt)
