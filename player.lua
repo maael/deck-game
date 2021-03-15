@@ -1,13 +1,12 @@
-local anim8 = require("vendor.anim8")
-local serialize = require("vendor.ser")
-local controls = require "controls".get("player")
-local Inventory = require("inventory")
+local anim8 = require('vendor.anim8')
+local controls = require'controls'.get('player')
+local Inventory = require('inventory')
 local Player = {}
 Player.__index = Player
 
-function Player.new (world, player_spawn)
+function Player.new(world, player_spawn)
   local player = {
-    name = "Player",
+    name = 'Player',
     is_player = true,
     health = 100,
     x = player_spawn.x,
@@ -27,7 +26,7 @@ function Player.new (world, player_spawn)
     current_anim = 'idle',
     is_dead = false,
     debug = false,
-    invulnerabe = true
+    invulnerabe = true,
   }
   local idle_spritesheet = love.graphics.newImage('assets/spritesheets/knight_idle_spritesheet.png')
   local idle_grid = anim8.newGrid(GRID_SIZE, GRID_SIZE, idle_spritesheet:getWidth(), idle_spritesheet:getHeight())
@@ -38,12 +37,12 @@ function Player.new (world, player_spawn)
   local run_animation = anim8.newAnimation(run_grid('1-6', 1), 0.2)
   player.animations.run = {anim = run_animation, sprites = run_spritesheet}
   setmetatable(player, Player)
-  player.physics.body = love.physics.newBody(world, player.x, player.y, "dynamic")
-  player.physics.shape = love.physics.newRectangleShape(0, player.size / 4, player.size,player.size / 2)
+  player.physics.body = love.physics.newBody(world, player.x, player.y, 'dynamic')
+  player.physics.shape = love.physics.newRectangleShape(0, player.size / 4, player.size, player.size / 2)
   player.physics.fixture = love.physics.newFixture(player.physics.body, player.physics.shape)
   player.physics.body:setFixedRotation(true)
   player.physics.fixture:setUserData(player)
-  controls:addAction("ESCAPE", function ()
+  controls:addAction('ESCAPE', function()
     love.event.quit()
   end)
   return player
@@ -57,38 +56,39 @@ function Player:setHealth(modifier)
   end
 end
 
-function Player:handlePickup (item)
-  if (item.item_type == "heal_potion") then
+function Player:handlePickup(item)
+  if (item.item_type == 'heal_potion') then
     self:setHealth(20)
   end
 end
 
-function Player:handleInteract ()
-  self.world:queryBoundingBox(self.x - GRID_SIZE, self.y - GRID_SIZE, self.x + GRID_SIZE, self.y + GRID_SIZE, function (fixture)
-    local should_continue_search = true
-    local data = fixture:getUserData()
-    if (data.is_lootable and data.handleLoot) then
-      data:handleLoot(self)
-    end
-    return should_continue_search
-  end)
+function Player:handleInteract()
+  self.world:queryBoundingBox(self.x - GRID_SIZE, self.y - GRID_SIZE, self.x + GRID_SIZE, self.y + GRID_SIZE,
+    function(fixture)
+      local should_continue_search = true
+      local data = fixture:getUserData()
+      if (data.is_lootable and data.handleLoot) then
+        data:handleLoot(self)
+      end
+      return should_continue_search
+    end)
 end
 
-function Player:update (dt)
-  self.sprinting = controls:isActionDown("SPRINT")
+function Player:update(dt)
+  self.sprinting = controls:isActionDown('SPRINT')
   local speed = (self.sprinting and self.sprint_speed or self.speed)
   local x_vel = 0
   local y_vel = 0
-  if (controls:isActionDown("RIGHT")) then
+  if (controls:isActionDown('RIGHT')) then
     x_vel = x_vel + speed
   end
-  if (controls:isActionDown("LEFT")) then
+  if (controls:isActionDown('LEFT')) then
     x_vel = x_vel + -speed
   end
-  if (controls:isActionDown("UP")) then
+  if (controls:isActionDown('UP')) then
     y_vel = y_vel + -speed
   end
-  if (controls:isActionDown("DOWN")) then
+  if (controls:isActionDown('DOWN')) then
     y_vel = y_vel + speed
   end
   if (x_vel ~= 0 or y_vel ~= 0) then
@@ -102,7 +102,7 @@ function Player:update (dt)
     self.current_anim = 'idle'
   end
   self.physics.body:setLinearVelocity(x_vel, y_vel)
-  if (controls:isActionDown("INTERACT")) then
+  if (controls:isActionDown('INTERACT')) then
     self:handleInteract()
   end
   self.x = self.physics.body:getX()
@@ -110,12 +110,13 @@ function Player:update (dt)
   self.animations[self.current_anim].anim:update(dt)
 end
 
-function Player:draw ()
+function Player:draw()
   local direction_modifier = self.current_direction == 'right' and 1 or -1
-  self.animations[self.current_anim].anim:draw(self.animations[self.current_anim].sprites, self.x, self.y, 0, direction_modifier, 1, self.size / 2, self.size / 2)
+  self.animations[self.current_anim].anim:draw(self.animations[self.current_anim].sprites, self.x, self.y, 0,
+    direction_modifier, 1, self.size / 2, self.size / 2)
   if (self.debug) then
     love.graphics.setColor(255, 0, 0, 1);
-    love.graphics.polygon("line", self.physics.body:getWorldPoints(self.physics.shape:getPoints()))
+    love.graphics.polygon('line', self.physics.body:getWorldPoints(self.physics.shape:getPoints()))
     -- Show interaction range points
     love.graphics.setColor(255, 0, 0, 1)
     love.graphics.points(self.x - GRID_SIZE, self.y - GRID_SIZE)

@@ -1,11 +1,11 @@
-local anim8 = require("vendor.anim8")
-local Inventory = require("inventory")
+local anim8 = require('vendor.anim8')
+local Inventory = require('inventory')
 local Enemy = {}
 Enemy.__index = Enemy
 
-function Enemy.new (world, enemy_spawn, player)
+function Enemy.new(world, enemy_spawn, player)
   local enemy = {
-    name = "Steve",
+    name = 'Steve',
     health = 100,
     x = enemy_spawn.x,
     y = enemy_spawn.y,
@@ -29,7 +29,7 @@ function Enemy.new (world, enemy_spawn, player)
     intersect_y = nil,
     can_see_player = false,
     player_normal_x = nil,
-    player_normal_y = nil
+    player_normal_y = nil,
   }
   local idle_spritesheet = love.graphics.newImage('assets/spritesheets/goblin_idle_spritesheet.png')
   local idle_grid = anim8.newGrid(GRID_SIZE, GRID_SIZE, idle_spritesheet:getWidth(), idle_spritesheet:getHeight())
@@ -40,25 +40,25 @@ function Enemy.new (world, enemy_spawn, player)
   local run_animation = anim8.newAnimation(run_grid('1-6', 1), 0.2)
   enemy.animations.run = {anim = run_animation, sprites = run_spritesheet}
   setmetatable(enemy, Enemy)
-  enemy.physics.body = love.physics.newBody(world, enemy.x, enemy.y, "dynamic")
-  enemy.physics.shape = love.physics.newRectangleShape(0, enemy.size / 4, enemy.size,enemy.size / 2)
+  enemy.physics.body = love.physics.newBody(world, enemy.x, enemy.y, 'dynamic')
+  enemy.physics.shape = love.physics.newRectangleShape(0, enemy.size / 4, enemy.size, enemy.size / 2)
   enemy.physics.fixture = love.physics.newFixture(enemy.physics.body, enemy.physics.shape)
   enemy.physics.body:setFixedRotation(true)
   enemy.physics.fixture:setUserData(enemy)
   return enemy
 end
 
-function Enemy:handlePickup (item)
-  if (item.item_type == "heal_potion") then
+function Enemy:handlePickup(item)
+  if (item.item_type == 'heal_potion') then
     self.health = math.min(self.health + 20, 100)
   end
 end
 
-function Enemy:handleCollidePlayer (player)
+function Enemy:handleCollidePlayer(player)
   player:setHealth(-1)
 end
 
-function Enemy:update (dt)
+function Enemy:update(dt)
   self.sprinting = true
   local speed = (self.sprinting and self.sprint_speed or self.speed)
   self:checkPlayerVisibility()
@@ -112,7 +112,7 @@ function Enemy:update (dt)
   self.animations[self.current_anim].anim:update(dt)
 end
 
-function Enemy:checkPlayerVisibility ()
+function Enemy:checkPlayerVisibility()
   self.can_see_player = false
   self.intersect_x = nil
   self.intersect_y = nil
@@ -122,7 +122,7 @@ function Enemy:checkPlayerVisibility ()
   if (distance <= self.vision_range) then
     local visible_hits = {}
     -- Get all fixtures between us and player
-    self.world:rayCast(self.x, self.y, self.player.x, self.player.y, function (fixture, x, y, xn, yn, fr)
+    self.world:rayCast(self.x, self.y, self.player.x, self.player.y, function(fixture, x, y, xn, yn, fr)
       table.insert(visible_hits, {fr = fr, data = fixture:getUserData(), x = x, y = y, xn = xn, yn = yn})
       return fr
     end)
@@ -147,10 +147,11 @@ function Enemy:checkPlayerVisibility ()
   end
 end
 
-function Enemy:draw ()
+function Enemy:draw()
   love.graphics.setColor(255, 255, 255, 1)
   local direction_modifier = self.current_direction == 'right' and 1 or -1
-  self.animations[self.current_anim].anim:draw(self.animations[self.current_anim].sprites, self.x, self.y, 0, direction_modifier, 1, self.size / 2, self.size / 2)
+  self.animations[self.current_anim].anim:draw(self.animations[self.current_anim].sprites, self.x, self.y, 0,
+    direction_modifier, 1, self.size / 2, self.size / 2)
 
   if (self.debug) then
     love.graphics.setLineWidth(2)
@@ -162,7 +163,7 @@ function Enemy:draw ()
       love.graphics.line(self.x, self.y, self.intersect_x, self.intersect_y)
     end
     love.graphics.setColor(255, 0, 0, 1);
-    love.graphics.polygon("line", self.physics.body:getWorldPoints(self.physics.shape:getPoints()))
+    love.graphics.polygon('line', self.physics.body:getWorldPoints(self.physics.shape:getPoints()))
   end
 end
 

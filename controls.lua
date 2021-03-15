@@ -1,11 +1,11 @@
 local actions = {
-  up = "UP",
-  down = "DOWN",
-  left = "LEFT",
-  right = "RIGHT",
-  interact = "INTERACT",
-  sprint = "SPRINT",
-  escape = "ESCAPE"
+  up = 'UP',
+  down = 'DOWN',
+  left = 'LEFT',
+  right = 'RIGHT',
+  interact = 'INTERACT',
+  sprint = 'SPRINT',
+  escape = 'ESCAPE',
 }
 
 local keyboard_map = {
@@ -33,20 +33,20 @@ local InputController = {}
 InputController.__index = InputController
 local cached = {}
 
-function InputController.new (name)
+function InputController.new(name)
   local controller = {}
   setmetatable(controller, InputController)
   controller.name = name
   controller.actions = actions
   controller.action_map = {}
   controller.release_action_map = {}
-  controller.type = "keyboard"
+  controller.type = 'keyboard'
   controller.wasDown = {}
   return controller
 end
 
 function InputController.get(name)
-  name = name or "DEFAULT"
+  name = name or 'DEFAULT'
   if cached[name] == nil then
     cached[name] = InputController.new(name)
   end
@@ -59,7 +59,7 @@ end
 
 function InputController:getTypeMap()
   local specific_map
-  if type == "gamepad" then
+  if type == 'gamepad' then
     specific_map = gamepad_map
   else
     specific_map = keyboard_map
@@ -72,7 +72,7 @@ function InputController:handlePressed(type, key)
 end
 
 function InputController:addAction(action, fn, type)
-  if type == "release" then
+  if type == 'release' then
     self.release_action_map[action] = fn
   else
     self.action_map[action] = fn
@@ -93,15 +93,14 @@ end
 
 function InputController:getActionToKeyTable()
   local specific_map = self:getTypeMap()
-  local s={}
-  for k,v in pairs(specific_map) do
-    s[v]=k
+  local s = {}
+  for k, v in pairs(specific_map) do
+    s[v] = k
   end
   return s
 end
 
-
-function InputController:isActionDown (action)
+function InputController:isActionDown(action)
   local action_map = self:getActionToKeyTable()
   local action_key = action_map[action]
   return love.keyboard.isDown(action_key)

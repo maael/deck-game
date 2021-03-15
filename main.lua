@@ -1,15 +1,14 @@
-require "globals"
-local sti = require "vendor/sti"
-local anim8 = require "vendor/anim8"
-local serialize = require "vendor/ser"
+require 'globals'
+local sti = require 'vendor/sti'
+local anim8 = require 'vendor/anim8'
 local Camera = require 'vendor/STALKER-X/camera'
 local fpsGraph = require 'vendor/FPSGraph'
-local controls = require "controls".get("player")
-local HUD = require "hud"
-local Player = require "player"
-local Enemy = require "enemy"
-local InteractiveEntity = require "interactive_entity"
-local LootableContainer = require "lootable_container"
+local controls = require'controls'.get('player')
+local HUD = require 'hud'
+local Player = require 'player'
+local Enemy = require 'enemy'
+local InteractiveEntity = require 'interactive_entity'
+local LootableContainer = require 'lootable_container'
 
 local player
 local hud
@@ -17,7 +16,7 @@ local camera
 local canvas
 local graph
 
-function BeginContact (a, b, coll)
+function BeginContact(a, b, coll)
   local a_data = a:getUserData()
   local b_data = b:getUserData()
   if (a_data.is_player) then
@@ -29,29 +28,29 @@ function BeginContact (a, b, coll)
   end
 end
 
-function love.load ()
+function love.load()
   graph = fpsGraph.createGraph(10, 50)
 
   love.graphics.setDefaultFilter('nearest', 'nearest')
   love.physics.setMeter(GRID_SIZE)
-	world = love.physics.newWorld(0, 0)
+  world = love.physics.newWorld(0, 0)
   world:setCallbacks(BeginContact)
-  map = sti("assets/dungeon.lua", { "box2d" })
-	map:box2d_init(world)
+  map = sti('assets/dungeon.lua', {'box2d'})
+  map:box2d_init(world)
 
   love.window.setMode(CANVAS_WIDTH * CANVAS_SCALE, CANVAS_HEIGHT * CANVAS_SCALE)
   canvas = love.graphics.newCanvas(CANVAS_WIDTH, CANVAS_HEIGHT)
-  camera = Camera(CANVAS_WIDTH / 2, CANVAS_HEIGHT /2, CANVAS_WIDTH, CANVAS_HEIGHT)
+  camera = Camera(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, CANVAS_WIDTH, CANVAS_HEIGHT)
   camera:setBounds(0, 0, map.width * map.tilewidth, map.height * map.tileheight)
   camera:setFollowStyle('TOPDOWN_TIGHT')
   camera:setFollowLerp(0.1)
 
   -- Find player spawn point
-  local gameObjects = map.layers["GameObjects"]
+  local gameObjects = map.layers['GameObjects']
   local player_spawn = {x = 0, y = 0}
 
   for _, object in pairs(gameObjects.objects) do
-    if (object.properties.object_type == "player_spawn") then
+    if (object.properties.object_type == 'player_spawn') then
       player_spawn.x = object.x
       player_spawn.y = object.y
     end
@@ -62,57 +61,62 @@ function love.load ()
 
   -- Add Player to custom layer in map
   -- This is the secret sauce that makes collisions work properly
-  map:addCustomLayer("Sprites", 7)
-	local spriteLayer = map.layers["Sprites"]
-	spriteLayer.sprites = { player }
-	function spriteLayer:update(dt)
-		for _, sprite in pairs(self.sprites) do
+  map:addCustomLayer('Sprites', 7)
+  local spriteLayer = map.layers['Sprites']
+  spriteLayer.sprites = {player}
+  function spriteLayer:update(dt)
+    for _, sprite in pairs(self.sprites) do
       if sprite.is_active then
         sprite:update(dt)
       end
-		end
-	end
-	function spriteLayer:draw()
-		for _, sprite in pairs(self.sprites) do
+    end
+  end
+  function spriteLayer:draw()
+    for _, sprite in pairs(self.sprites) do
       if sprite.is_active then
         sprite:draw()
       end
-		end
-	end
-
-  -- Process game objects
-  local tile_set_img = love.graphics.newImage("assets/dungeon_tiles.png")
-  local tile_set_grid = anim8.newGrid(GRID_SIZE, GRID_SIZE, tile_set_img:getWidth(), tile_set_img:getHeight())
-
-  local gameObjects = map.layers["GameObjects"]
-  for _, object in pairs(gameObjects.objects) do
-    if object.properties.object_type ~= nil and object.properties.object_type == "enemy_spawn" then
-      table.insert(spriteLayer.sprites, Enemy.new(world, {x = object.x, y= object.y}, player))
-    elseif object.properties.object_type ~= nil and object.properties.object_type ~= "player_spawn" then
-      table.insert(spriteLayer.sprites, InteractiveEntity.new(world, object.x, object.y, object.properties.object_type, object.properties.item_type, tile_set_img, tile_set_grid))
     end
   end
-  map:removeLayer("GameObjects")
-  local persistentGameObjects = map.layers["PersistentGameObjects"]
+
+  -- Process game objects
+  local tile_set_img = love.graphics.newImage('assets/dungeon_tiles.png')
+  local tile_set_grid = anim8.newGrid(GRID_SIZE, GRID_SIZE, tile_set_img:getWidth(), tile_set_img:getHeight())
+
+  local gameObjects = map.layers['GameObjects']
+  for _, object in pairs(gameObjects.objects) do
+    if object.properties.object_type ~= nil and object.properties.object_type == 'enemy_spawn' then
+      table.insert(spriteLayer.sprites, Enemy.new(world, {x = object.x, y = object.y}, player))
+    elseif object.properties.object_type ~= nil and object.properties.object_type ~= 'player_spawn' then
+      table.insert(spriteLayer.sprites,
+        InteractiveEntity.new(world, object.x, object.y, object.properties.object_type, object.properties.item_type,
+          tile_set_img, tile_set_grid))
+    end
+  end
+  map:removeLayer('GameObjects')
+  local persistentGameObjects = map.layers['PersistentGameObjects']
   for _, object in pairs(persistentGameObjects.objects) do
     if object.properties.lootable then
-      table.insert(spriteLayer.sprites, LootableContainer.new(world, object.x, object.y, tile_set_img, tile_set_grid, spriteLayer.sprites))
+      table.insert(spriteLayer.sprites,
+        LootableContainer.new(world, object.x, object.y, tile_set_img, tile_set_grid, spriteLayer.sprites))
     else
-      table.insert(spriteLayer.sprites, InteractiveEntity.new(world, object.x, object.y, object.properties.object_type, object.properties.item_type, tile_set_img, tile_set_grid))
+      table.insert(spriteLayer.sprites,
+        InteractiveEntity.new(world, object.x, object.y, object.properties.object_type, object.properties.item_type,
+          tile_set_img, tile_set_grid))
     end
   end
 end
 
 function love.keypressed(key)
-  controls:handlePressed("keyboard", key)
+  controls:handlePressed('keyboard', key)
 end
 
-function love.gamepadpressed (key)
-  controls:handlePressed("gamepad", key)
+function love.gamepadpressed(key)
+  controls:handlePressed('gamepad', key)
 end
 
 function love.update(dt)
-  love.window.setTitle("DeckGame v0.0.1 (FPS: "..love.timer.getFPS()..")")
+  love.window.setTitle('DeckGame v0.0.1 (FPS: ' .. love.timer.getFPS() .. ')')
   world:update(dt)
   map:update(dt)
   controls:update(dt)
