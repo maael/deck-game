@@ -1,4 +1,5 @@
 local anim8 = require("vendor.anim8")
+local serialize = require("vendor.ser")
 local controls = require "controls".get("player")
 local Inventory = require("inventory")
 local Player = {}
@@ -25,7 +26,8 @@ function Player.new (world, player_spawn)
     current_direction = 'right',
     current_anim = 'idle',
     is_dead = false,
-    debug = false
+    debug = false,
+    invulnerabe = true
   }
   local idle_spritesheet = love.graphics.newImage('assets/spritesheets/knight_idle_spritesheet.png')
   local idle_grid = anim8.newGrid(GRID_SIZE, GRID_SIZE, idle_spritesheet:getWidth(), idle_spritesheet:getHeight())
@@ -49,7 +51,7 @@ end
 
 function Player:setHealth(modifier)
   self.health = math.max(math.min(self.health + modifier, 100), 0)
-  if (self.health == 0) then
+  if (self.health == 0 and not self.invulnerabe) then
     self.is_dead = true
     self.is_active = false
   end
@@ -59,6 +61,17 @@ function Player:handlePickup (item)
   if (item.item_type == "heal_potion") then
     self:setHealth(20)
   end
+end
+
+function Player:handleInteract ()
+  self.world:queryBoundingBox(self.x - GRID_SIZE, self.y - GRID_SIZE, self.x + GRID_SIZE, self.y + GRID_SIZE, function (fixture)
+    local should_continue_search = true
+    local data = fixture:getUserData()
+    if (data.is_lootable and data.handleLoot) then
+      data:handleLoot(self)
+    end
+    return should_continue_search
+  end)
 end
 
 function Player:update (dt)
@@ -90,10 +103,10 @@ function Player:update (dt)
   end
   self.physics.body:setLinearVelocity(x_vel, y_vel)
   if (controls:isActionDown("INTERACT")) then
-    self:setHealth(-1)
+    self:handleInteract()
   end
-  self.x = self.physics.body:getX();
-  self.y = self.physics.body:getY();
+  self.x = self.physics.body:getX()
+  self.y = self.physics.body:getY()
   self.animations[self.current_anim].anim:update(dt)
 end
 
@@ -103,6 +116,13 @@ function Player:draw ()
   if (self.debug) then
     love.graphics.setColor(255, 0, 0, 1);
     love.graphics.polygon("line", self.physics.body:getWorldPoints(self.physics.shape:getPoints()))
+    -- Show interaction range points
+    love.graphics.setColor(255, 0, 0, 1)
+    love.graphics.points(self.x - GRID_SIZE, self.y - GRID_SIZE)
+    love.graphics.setColor(0, 255, 0, 1)
+    love.graphics.points(self.x + GRID_SIZE, self.y + GRID_SIZE)
+    love.graphics.setColor(0, 0, 255, 1)
+    love.graphics.points(self.x, self.y)
   end
 end
 

@@ -1,5 +1,7 @@
 require "globals"
 local sti = require "vendor/sti"
+local anim8 = require "vendor/anim8"
+local serialize = require "vendor/ser"
 local Camera = require 'vendor/STALKER-X/camera'
 local fpsGraph = require 'vendor/FPSGraph'
 local controls = require "controls".get("player")
@@ -7,6 +9,7 @@ local HUD = require "hud"
 local Player = require "player"
 local Enemy = require "enemy"
 local InteractiveEntity = require "interactive_entity"
+local LootableContainer = require "lootable_container"
 
 local player
 local hud
@@ -79,16 +82,23 @@ function love.load ()
 
   -- Process game objects
   local tile_set_img = love.graphics.newImage("assets/dungeon_tiles.png")
+  local tile_set_grid = anim8.newGrid(GRID_SIZE, GRID_SIZE, tile_set_img:getWidth(), tile_set_img:getHeight())
 
   local gameObjects = map.layers["GameObjects"]
   for _, object in pairs(gameObjects.objects) do
     if object.properties.object_type ~= nil and object.properties.object_type == "enemy_spawn" then
       table.insert(spriteLayer.sprites, Enemy.new(world, {x = object.x, y= object.y}, player))
     elseif object.properties.object_type ~= nil and object.properties.object_type ~= "player_spawn" then
-      table.insert(spriteLayer.sprites, InteractiveEntity.new(world, object.x, object.y, object.properties.object_type, object.properties.item_type, tile_set_img))
+      table.insert(spriteLayer.sprites, InteractiveEntity.new(world, object.x, object.y, object.properties.object_type, object.properties.item_type, tile_set_img, tile_set_grid))
     end
   end
   map:removeLayer("GameObjects")
+  local persistentGameObjects = map.layers["PersistentGameObjects"]
+  for _, object in pairs(persistentGameObjects.objects) do
+    if object.properties.lootable then
+      table.insert(spriteLayer.sprites, LootableContainer.new(world, object.x, object.y, tile_set_img, tile_set_grid, spriteLayer.sprites))
+    end
+  end
 end
 
 function love.keypressed(key)
