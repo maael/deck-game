@@ -93,7 +93,7 @@ function love.load()
     elseif object.properties.object_type ~= nil and object.properties.object_type ~= 'player_spawn' then
       table.insert(spriteLayer.sprites,
         InteractiveEntity.new(world, object.x, object.y, object.properties.object_type, object.properties.item_type,
-          tile_set_img, tile_set_grid))
+          map.tilesets[map.tiles[object.gid].tileset].image, map.tiles[object.gid].quad))
     end
   end
   map:removeLayer('GameObjects')
@@ -105,7 +105,7 @@ function love.load()
     else
       table.insert(spriteLayer.sprites,
         InteractiveEntity.new(world, object.x, object.y, object.properties.object_type, object.properties.item_type,
-          tile_set_img, tile_set_grid))
+          map.tilesets[map.tiles[object.gid].tileset].image, map.tiles[object.gid].quad))
     end
   end
 end

@@ -1,21 +1,9 @@
 local InteractiveEntity = {}
 InteractiveEntity.__index = InteractiveEntity
 
-function InteractiveEntity.new(world, x, y, object_type, item_type, tile_set_img, tile_set_grid)
-  local color = {191, 191, 191, 1}
+function InteractiveEntity.new(world, x, y, object_type, item_type, tile_set_img, tile_set_quad)
+  local color = {191, 191, 191, 0.5}
   local sprite_quad = nil
-  if (item_type == 'heal_potion') then
-    color = {255, 0, 0, 0.5}
-    sprite_quad = tile_set_grid(8, 1)[1]
-  elseif (item_type == 'key') then
-    color = {0, 255, 0, 0.5}
-    sprite_quad = tile_set_grid(6, 1)[1]
-  elseif (object_type == 'stairs') then
-    color = {0, 255, 0, 0.5}
-    sprite_quad = tile_set_grid(2, 4)[1]
-  else
-    color = {0, 0, 255, 0.5}
-  end
   local interactive_entity = {
     x = x,
     y = y - GRID_SIZE,
@@ -32,6 +20,7 @@ function InteractiveEntity.new(world, x, y, object_type, item_type, tile_set_img
     debug = false,
     is_active = true,
     tile_set_img = tile_set_img,
+    tile_set_quad = tile_set_quad,
   }
   interactive_entity.physics.body = love.physics.newBody(world, interactive_entity.x + (GRID_SIZE / 2),
     interactive_entity.y + (GRID_SIZE / 2), 'static')
@@ -67,9 +56,9 @@ end
 
 function InteractiveEntity:draw()
   if (self.object_type == 'pickup_item') then
-    if (self.tile_set_img and self.sprite_quad) then
+    if (self.tile_set_img and self.tile_set_quad) then
       love.graphics.setColor({255, 255, 255, 1})
-      love.graphics.draw(self.tile_set_img, self.sprite_quad, self.x, self.y)
+      love.graphics.draw(self.tile_set_img, self.tile_set_quad, self.x, self.y)
     else
       love.graphics.setColor(self.color)
       love.graphics.rectangle('fill', self.x, self.y, GRID_SIZE, GRID_SIZE)
@@ -81,9 +70,9 @@ function InteractiveEntity:draw()
     local shadow_width = 4 + self.bounce_height - (self.base_y - self.y)
     love.graphics.ellipse('fill', self.x + (GRID_SIZE / 2), self.base_y + GRID_SIZE, shadow_width, 2)
   elseif self.object_type == 'stairs' then
-    if (self.tile_set_img and self.sprite_quad) then
+    if (self.tile_set_img and self.tile_set_quad) then
       love.graphics.setColor({255, 255, 255, 1})
-      love.graphics.draw(self.tile_set_img, self.sprite_quad, self.x, self.y)
+      love.graphics.draw(self.tile_set_img, self.tile_set_quad, self.x, self.y)
     end
   else
     love.graphics.setColor(self.color)

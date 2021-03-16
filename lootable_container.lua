@@ -34,7 +34,7 @@ function LootableContainer:handleLoot(player)
     self.is_looted = true
     table.insert(self.spritesLayer,
       InteractiveEntity.new(self.world, self.x, self.y + GRID_SIZE, 'pickup_item', 'heal_potion', self.tile_set_img,
-        self.tile_set_grid))
+        self.tile_set_grid(8, 1)[1]))
   end
 end
 
