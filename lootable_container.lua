@@ -14,6 +14,7 @@ function LootableContainer.new(world, x, y, tile_set_img, tile_set_grid, sprites
     spritesLayer = spritesLayer,
     tile_set_img = tile_set_img,
     tile_set_grid = tile_set_grid,
+    is_active = true,
   }
   setmetatable(lootable_container, LootableContainer)
   lootable_container.physics.body = love.physics.newBody(world, lootable_container.x + (GRID_SIZE / 2),

@@ -21,10 +21,10 @@ local player_menu
 function BeginContact(a, b, coll)
   local a_data = a:getUserData()
   local b_data = b:getUserData()
-  if (a_data.is_player) then
-    if (b_data.handleCollidePlayer) then
+  if (a_data.is_player and a_data.is_active) then
+    if (b_data.handleCollidePlayer and b_data.is_active) then
       b_data:handleCollidePlayer(a_data)
-    elseif (b_data.onPickup) then
+    elseif (b_data.onPickup and b_data.is_active) then
       b_data:onPickup(a_data)
     end
   end

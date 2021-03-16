@@ -56,6 +56,7 @@ function InteractiveEntity:update(dt)
 end
 
 function InteractiveEntity:onPickup(player)
+  if (not self.is_active) then return end
   if (self.object_type == 'pickup_item') then
     self.is_active = false
     player:handlePickup(self)
