@@ -10,6 +10,7 @@ local PlayerMenu = require 'player_menu'
 local Enemy = require 'enemy'
 local InteractiveEntity = require 'interactive_entity'
 local LootableContainer = require 'lootable_container'
+local assets = require "assets"
 
 local player
 local hud
@@ -75,6 +76,9 @@ function love.load()
     end
   end
   function spriteLayer:draw()
+    table.sort(self.sprites, function (a, b)
+      return (a.y + GRID_SIZE) < b.y
+    end)
     for _, sprite in pairs(self.sprites) do
       if sprite.is_active then
         sprite:draw()
@@ -83,9 +87,6 @@ function love.load()
   end
 
   -- Process game objects
-  local tile_set_img = love.graphics.newImage('assets/dungeon_tiles.png')
-  local tile_set_grid = anim8.newGrid(GRID_SIZE, GRID_SIZE, tile_set_img:getWidth(), tile_set_img:getHeight())
-
   local gameObjects = map.layers['GameObjects']
   for _, object in pairs(gameObjects.objects) do
     if object.properties.object_type ~= nil and object.properties.object_type == 'enemy_spawn' then
@@ -101,13 +102,14 @@ function love.load()
   for _, object in pairs(persistentGameObjects.objects) do
     if object.properties.lootable then
       table.insert(spriteLayer.sprites,
-        LootableContainer.new(world, object.x, object.y, tile_set_img, tile_set_grid, spriteLayer.sprites))
+        LootableContainer.new(world, object.x, object.y, map.tilesets[map.tiles[object.gid].tileset].image, map.tiles[object.gid].quad, spriteLayer.sprites))
     else
       table.insert(spriteLayer.sprites,
         InteractiveEntity.new(world, object.x, object.y, object.properties.object_type, object.properties.item_type,
           map.tilesets[map.tiles[object.gid].tileset].image, map.tiles[object.gid].quad))
     end
   end
+  map:removeLayer('PersistentGameObjects')
 end
 
 function love.keypressed(key)

@@ -148,6 +148,7 @@ function Enemy:checkPlayerVisibility()
 end
 
 function Enemy:draw()
+  love.graphics.push()
   love.graphics.setColor(255, 255, 255, 1)
   local direction_modifier = self.current_direction == 'right' and 1 or -1
   self.animations[self.current_anim].anim:draw(self.animations[self.current_anim].sprites, self.x, self.y, 0,
@@ -165,6 +166,7 @@ function Enemy:draw()
     love.graphics.setColor(255, 0, 0, 1);
     love.graphics.polygon('line', self.physics.body:getWorldPoints(self.physics.shape:getPoints()))
   end
+  love.graphics.pop()
 end
 
 return Enemy

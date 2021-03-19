@@ -1,4 +1,7 @@
 local assets = {
+  tilesets = {
+    dungeon = love.graphics.newImage("assets/dungeon_tiles.png")
+  },
   cards = {
     hp = love.graphics.newImage('assets/sprites/cards/HP.PNG'),
     manastorm = love.graphics.newImage('assets/sprites/cards/mana_storm.PNG'),

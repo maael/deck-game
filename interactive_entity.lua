@@ -55,14 +55,15 @@ function InteractiveEntity:onPickup(player)
 end
 
 function InteractiveEntity:draw()
+  love.graphics.push()
+  if (self.tile_set_img and self.tile_set_quad) then
+    love.graphics.setColor({255, 255, 255, 1})
+    love.graphics.draw(self.tile_set_img, self.tile_set_quad, self.x, self.y)
+  else
+    love.graphics.setColor(self.color)
+    love.graphics.rectangle('fill', self.x, self.y, GRID_SIZE, GRID_SIZE)
+  end
   if (self.object_type == 'pickup_item') then
-    if (self.tile_set_img and self.tile_set_quad) then
-      love.graphics.setColor({255, 255, 255, 1})
-      love.graphics.draw(self.tile_set_img, self.tile_set_quad, self.x, self.y)
-    else
-      love.graphics.setColor(self.color)
-      love.graphics.rectangle('fill', self.x, self.y, GRID_SIZE, GRID_SIZE)
-    end
     if (self.debug) then
       love.graphics.polygon('line', self.physics.body:getWorldPoints(self.physics.shape:getPoints()))
     end
@@ -74,10 +75,8 @@ function InteractiveEntity:draw()
       love.graphics.setColor({255, 255, 255, 1})
       love.graphics.draw(self.tile_set_img, self.tile_set_quad, self.x, self.y)
     end
-  else
-    love.graphics.setColor(self.color)
-    love.graphics.rectangle('fill', self.x, self.y, GRID_SIZE, GRID_SIZE)
   end
+  love.graphics.pop()
 end
 
 return InteractiveEntity

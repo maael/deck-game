@@ -129,7 +129,9 @@ function Player:update(dt)
 end
 
 function Player:draw()
+  love.graphics.push()
   local direction_modifier = self.current_direction == 'right' and 1 or -1
+  love.graphics.setColor({255, 255, 255, 1})
   self.animations[self.current_anim].anim:draw(self.animations[self.current_anim].sprites, self.x, self.y, 0,
     direction_modifier, 1, self.size / 2, self.size / 2)
   if (self.debug) then
@@ -143,6 +145,7 @@ function Player:draw()
     love.graphics.setColor(0, 0, 255, 1)
     love.graphics.points(self.x, self.y)
   end
+  love.graphics.pop()
 end
 
 return Player
