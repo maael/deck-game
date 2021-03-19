@@ -1,3 +1,4 @@
+local DeckHud = require "deck_hud"
 local HUD = {}
 HUD.__index = HUD
 
@@ -5,6 +6,7 @@ function HUD.new(player)
   local hud = {}
   setmetatable(hud, HUD)
   hud.player = player
+  hud.deck_hud = DeckHud.new(player)
   return hud
 end
 
@@ -39,6 +41,7 @@ function HUD:drawHealth()
 end
 
 function HUD:draw(canvas)
+  self.deck_hud:draw()
   self:drawMinimap(canvas)
   self:drawHealth()
   love.graphics.reset()
