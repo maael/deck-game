@@ -1,3 +1,4 @@
+local assets = require "assets"
 local anim8 = require('vendor.anim8')
 local controls = require'controls'.get('player')
 local Inventory = require('inventory')
@@ -27,7 +28,15 @@ function Player.new(world, player_spawn, map)
     is_dead = false,
     debug = false,
     invulnerabe = true,
-    map = map
+    map = map,
+    hand = {
+      assets.cards.hp,
+      assets.cards.hp,
+      assets.cards.hp,
+      assets.cards.hp,
+      assets.cards.manastorm,
+      assets.cards.manastorm,
+    }
   }
   local idle_spritesheet = love.graphics.newImage('assets/spritesheets/knight_idle_spritesheet.png')
   local idle_grid = anim8.newGrid(GRID_SIZE, GRID_SIZE, idle_spritesheet:getWidth(), idle_spritesheet:getHeight())
@@ -46,6 +55,14 @@ function Player.new(world, player_spawn, map)
   return player
 end
 
+function Player:addCardToHand (card)
+  table.insert(self.hand, card)
+end
+
+function Player:playCard (idx)
+  table.remove(self.hand, idx)
+end
+
 function Player:setHealth(modifier)
   self.health = math.max(math.min(self.health + modifier, 100), 0)
   if (self.health == 0 and not self.invulnerabe) then
@@ -56,7 +73,10 @@ end
 
 function Player:handlePickup(item)
   if (item.item_type == 'heal_potion') then
+    self:addCardToHand(assets.cards.hp)
     self:setHealth(20)
+  elseif (item.item_type == 'key') then
+    self:addCardToHand(assets.cards.chest)
   end
 end
 

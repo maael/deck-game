@@ -1,5 +1,4 @@
 local controls = require'controls'.get('player_menu')
-local serialize = require "vendor.ser"
 local PlayerMenu = {}
 PlayerMenu.__index = PlayerMenu
 
@@ -20,6 +19,7 @@ function PlayerMenu:update(dt)
 end
 
 function PlayerMenu:handleSelect()
+  if (not self.is_open) then return end
   local selected_option = self.options[self.selected]
   if (selected_option == 'Exit') then
     love.event.quit()
