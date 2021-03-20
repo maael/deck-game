@@ -269,38 +269,6 @@ return {
           }
         },
         {
-          id = 30,
-          name = "",
-          type = "",
-          shape = "rectangle",
-          x = 254.011,
-          y = 248.194,
-          width = 8.72558,
-          height = 5.3323,
-          rotation = 0,
-          visible = false,
-          properties = {
-            ["collidable"] = true,
-            ["static"] = true
-          }
-        },
-        {
-          id = 31,
-          name = "",
-          type = "",
-          shape = "rectangle",
-          x = 273.886,
-          y = 227.35,
-          width = 7.27132,
-          height = 4.84754,
-          rotation = 0,
-          visible = false,
-          properties = {
-            ["collidable"] = true,
-            ["static"] = true
-          }
-        },
-        {
           id = 39,
           name = "",
           type = "",
@@ -844,15 +812,15 @@ return {
           name = "",
           type = "",
           shape = "rectangle",
-          x = 199.152,
-          y = 35.8788,
+          x = 199.113,
+          y = 35.8398,
           width = 16,
           height = 16,
           rotation = 0,
           gid = 3,
           visible = true,
           properties = {
-            ["collidable"] = true,
+            ["custom_collidable"] = true,
             ["lootable"] = true
           }
         },
@@ -861,15 +829,15 @@ return {
           name = "",
           type = "",
           shape = "rectangle",
-          x = 214.546,
-          y = 36.2996,
+          x = 215.124,
+          y = 35.844,
           width = 16,
           height = 16,
           rotation = 0,
           gid = 3,
           visible = true,
           properties = {
-            ["collidable"] = true,
+            ["custom_collidable"] = true,
             ["lootable"] = true
           }
         },
@@ -886,9 +854,8 @@ return {
           gid = 2,
           visible = true,
           properties = {
-            ["collidable"] = true,
-            ["lootable"] = true,
-            ["sensor"] = true
+            ["custom_collidable"] = true,
+            ["lootable"] = true
           }
         },
         {
@@ -904,9 +871,8 @@ return {
           gid = 2,
           visible = true,
           properties = {
-            ["collidable"] = true,
-            ["lootable"] = true,
-            ["sensor"] = true
+            ["custom_collidable"] = true,
+            ["lootable"] = true
           }
         },
         {

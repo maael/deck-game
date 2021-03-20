@@ -74,11 +74,11 @@ function love.load()
         sprite:update(dt)
       end
     end
-  end
-  function spriteLayer:draw()
     table.sort(self.sprites, function (a, b)
       return (a.y + GRID_SIZE) < b.y
     end)
+  end
+  function spriteLayer:draw()
     for _, sprite in pairs(self.sprites) do
       if sprite.is_active then
         sprite:draw()
