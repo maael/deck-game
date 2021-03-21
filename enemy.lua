@@ -1,17 +1,18 @@
 local anim8 = require('vendor.anim8')
+local serialize = require('vendor.ser')
 local Inventory = require('inventory')
 local Enemy = {}
 Enemy.__index = Enemy
 
-function Enemy.new(world, enemy_spawn, player)
+function Enemy.new(world, enemy_spawn, player, map, collision_map, pathfinder)
   local enemy = {
     name = 'Steve',
     health = 100,
     x = enemy_spawn.x,
     y = enemy_spawn.y,
     size = GRID_SIZE,
-    speed = 50,
-    sprint_speed = 100,
+    speed = 25,
+    sprint_speed = 50,
     sprinting = false,
     inventory = Inventory.new(),
     world = world,
@@ -30,6 +31,11 @@ function Enemy.new(world, enemy_spawn, player)
     can_see_player = false,
     player_normal_x = nil,
     player_normal_y = nil,
+    collision_map = collision_map,
+    pathfinder = pathfinder,
+    path = nil,
+    goal = nil,
+    map = map
   }
   local idle_spritesheet = love.graphics.newImage('assets/spritesheets/goblin_idle_spritesheet.png')
   local idle_grid = anim8.newGrid(GRID_SIZE, GRID_SIZE, idle_spritesheet:getWidth(), idle_spritesheet:getHeight())
@@ -75,27 +81,72 @@ function Enemy:update(dt)
     end
   end
 
-  if (self.can_see_player) then
-    -- TODO: Using the player_normal values seems whack
-    -- TODO: Should commute direction for forces from
-    -- TODO: our position and player position directly
-    if (self.player_normal_x == -1) then
-      x_vel = x_vel + speed
+  local current_x, current_y = self.map:convertPixelToTile(self.x, self.y)
+  local rounded_current_x, rounded_current_y = math.floor(current_x), math.floor(current_y)
+
+  if (self.goal) then
+    local initial_goal_x, initial_goal_y = self.map:convertPixelToTile(self.goal.x, self.goal.y)
+    if (rounded_current_x == math.floor(initial_goal_x) and rounded_current_y == math.floor(initial_goal_y)) then
+      self.path = nil
+      self.goal = nil
     end
-    if (self.player_normal_x == 1) then
-      x_vel = x_vel + -speed
-    end
-    if (self.player_normal_y == 1) then
-      y_vel = y_vel + -speed
-    end
-    if (self.player_normal_y == -1) then
-      y_vel = y_vel + speed
-    end
-  else
-    -- TODO: Get goal destination and try to get there when no player
-    x_vel = math.random(-1, 1) * speed
-    y_vel = math.random(-1, 1) * speed
   end
+
+  if (self.can_see_player) then
+    self.goal = {x = self.player.x, y = self.player.y}
+    self.path = nil
+  elseif (self.goal == nil or self.path == nil) then
+    self.goal = nil
+    while (self.goal == nil) do
+      local potential_x = math.random(table.getn(self.collision_map[1]))
+      local potential_y = math.random(table.getn(self.collision_map))
+      local is_walkable = self.collision_map[potential_y][potential_x]
+      if (is_walkable == 1) then
+        local potential_pixel_x, potential_pixel_y = self.map:convertTileToPixel(potential_x - 1, potential_y - 1)
+        self.goal = {x = potential_pixel_x, y = potential_pixel_y}
+      end
+    end
+  end
+
+  -- Get path is missing one path
+  if (self.path == nil and self.goal ~= nil) then
+    local goal_x, goal_y = self.map:convertPixelToTile(self.goal.x, self.goal.y)
+    local path = self.pathfinder:getPath(rounded_current_x, rounded_current_y, math.floor(goal_x), math.floor(goal_y))
+    if (path) then
+      self.path = {}
+      for node in path:nodes() do
+        table.insert(self.path, {x = node:getX() - 1, y = node:getY() - 1})
+      end
+    else
+      self.path = nil
+      self.goal = nil
+    end
+  end
+
+  if (self.path and self.path[2] and rounded_current_x == self.path[2].x and rounded_current_y == self.path[2].y) then
+    table.remove(self.path, 2)
+  end
+
+  local normalised_x = 0
+  local normalised_y = 0
+  if (self.path and self.path[2]) then
+    local path_pix_x, path_pix_y = map:convertTileToPixel(self.path[2].x, self.path[2].y)
+    local diff_x = math.floor(self.x - (path_pix_x + (GRID_SIZE / 2)))
+    local diff_y = math.floor(self.y - (path_pix_y + (GRID_SIZE / 2)))
+    normalised_x = diff_x < 0 and 1 or diff_x == 0 and 0 or -1
+    normalised_y = diff_y < 0 and 1 or diff_y == 0 and 0 or -1
+  elseif (self.can_see_player) then
+    local diff_x = self.x - self.player.x
+    local diff_y = self.y - self.player.y
+    normalised_x = diff_x < 0 and 1 or diff_x == 0 and 0 or -1
+    normalised_y = diff_y < 0 and 1 or diff_y == 0 and 0 or -1
+  else
+    self.path = nil
+  end
+
+  x_vel = normalised_x * speed
+  y_vel = normalised_y * speed
+
   if (x_vel ~= 0 or y_vel ~= 0) then
     if (x_vel > 0) then
       self.current_direction = 'right'
@@ -165,6 +216,16 @@ function Enemy:draw()
     end
     love.graphics.setColor(255, 0, 0, 1);
     love.graphics.polygon('line', self.physics.body:getWorldPoints(self.physics.shape:getPoints()))
+    if (self.path) then
+      for i, node in pairs(self.path) do
+        if (i == 1) then
+          love.graphics.setColor(0, 0, 255, 0.5);
+        else
+          love.graphics.setColor(0, 255, 0, 0.5);
+        end
+        love.graphics.rectangle("fill", node.x * GRID_SIZE, node.y * GRID_SIZE, GRID_SIZE, GRID_SIZE)
+      end
+    end
   end
   love.graphics.pop()
 end

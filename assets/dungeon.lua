@@ -9,7 +9,7 @@ return {
   tilewidth = 16,
   tileheight = 16,
   nextlayerid = 9,
-  nextobjectid = 72,
+  nextobjectid = 74,
   properties = {},
   tilesets = {
     {
@@ -659,12 +659,12 @@ return {
           name = "",
           type = "",
           shape = "rectangle",
-          x = 103.737,
-          y = 54.2925,
+          x = 56.6461,
+          y = 40.838,
           width = 0,
           height = 0,
           rotation = 0,
-          visible = false,
+          visible = true,
           properties = {
             ["object_type"] = "player_spawn"
           }
@@ -731,27 +731,12 @@ return {
           name = "",
           type = "",
           shape = "rectangle",
-          x = 243,
-          y = 156.667,
+          x = 248.25,
+          y = 151.417,
           width = 0,
           height = 0,
           rotation = 0,
-          visible = false,
-          properties = {
-            ["object_type"] = "enemy_spawn"
-          }
-        },
-        {
-          id = 52,
-          name = "",
-          type = "",
-          shape = "rectangle",
-          x = 448.333,
-          y = 148.667,
-          width = 0,
-          height = 0,
-          rotation = 0,
-          visible = false,
+          visible = true,
           properties = {
             ["object_type"] = "enemy_spawn"
           }
@@ -773,6 +758,36 @@ return {
             ["item_type"] = "key",
             ["object_type"] = "pickup_item",
             ["sensor"] = true
+          }
+        },
+        {
+          id = 72,
+          name = "",
+          type = "",
+          shape = "rectangle",
+          x = 364,
+          y = 518,
+          width = 0,
+          height = 0,
+          rotation = 0,
+          visible = true,
+          properties = {
+            ["object_type"] = "enemy_spawn"
+          }
+        },
+        {
+          id = 73,
+          name = "",
+          type = "",
+          shape = "rectangle",
+          x = 443.333,
+          y = 138.667,
+          width = 0,
+          height = 0,
+          rotation = 0,
+          visible = true,
+          properties = {
+            ["object_type"] = "enemy_spawn"
           }
         }
       }

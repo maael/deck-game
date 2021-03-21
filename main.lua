@@ -1,8 +1,11 @@
 require 'globals'
 local sti = require 'vendor/sti'
 local anim8 = require 'vendor/anim8'
+local serialize = require "vendor.ser"
 local Camera = require 'vendor/STALKER-X/camera'
 local fpsGraph = require 'vendor/FPSGraph'
+local Grid = require ("vendor/jumper.grid")
+local Pathfinder = require ("vendor/jumper.pathfinder")
 local controls = require'controls'.get('player')
 local HUD = require 'hud'
 local Player = require 'player'
@@ -63,6 +66,19 @@ function love.load()
   player_menu = PlayerMenu.new(player)
   hud = HUD.new(player)
 
+  -- Create collision map for path finding
+  -- TODO: Seems to be off by one or something
+  local collision_map = {}
+  local walkable = 1
+  for y = 1, map.height do
+    collision_map[y] = {}
+    for x = 1, map.width do
+      collision_map[y][x] = map.layers['Floor'].data[y][x] and walkable or 0
+    end
+  end
+  local jumper_grid = Grid(collision_map)
+  local finder = Pathfinder(jumper_grid, 'JPS', walkable)
+
   -- Add Player to custom layer in map
   -- This is the secret sauce that makes collisions work properly
   map:addCustomLayer('Sprites', 7)
@@ -90,7 +106,7 @@ function love.load()
   local gameObjects = map.layers['GameObjects']
   for _, object in pairs(gameObjects.objects) do
     if object.properties.object_type ~= nil and object.properties.object_type == 'enemy_spawn' then
-      table.insert(spriteLayer.sprites, Enemy.new(world, {x = object.x, y = object.y}, player))
+      table.insert(spriteLayer.sprites, Enemy.new(world, {x = object.x, y = object.y}, player, map, collision_map, finder))
     elseif object.properties.object_type ~= nil and object.properties.object_type ~= 'player_spawn' then
       table.insert(spriteLayer.sprites,
         InteractiveEntity.new(world, object.x, object.y, object.properties.object_type, object.properties.item_type,
@@ -142,10 +158,10 @@ function love.draw()
   camera:attach()
   love.graphics.setColor({255, 255, 255, 1})
   map:draw(math.floor(-camera.x + CANVAS_WIDTH / 2), math.floor(-camera.y + CANVAS_HEIGHT / 2))
-  player_menu:draw()
   -- love.graphics.setColor({255, 0, 0, 1})
   -- map:box2d_draw()
   -- love.graphics.setColor({255, 255, 255, 1})
+  player_menu:draw()
   camera:detach()
   camera:draw()
   love.graphics.setCanvas()
