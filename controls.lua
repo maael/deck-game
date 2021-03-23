@@ -7,6 +7,9 @@ local actions = {
   sprint = 'SPRINT',
   escape = 'ESCAPE',
   select = "SELECT",
+  card_left = "CARD_LEFT",
+  card_right = "CARD_RIGHT",
+  card_use = "CARD_USE"
 }
 
 local keyboard_map = {
@@ -19,6 +22,9 @@ local keyboard_map = {
   escape = actions.escape,
   q = actions.escape,
   ['return'] = actions.select,
+  a = actions.card_left,
+  d = actions.card_right,
+  s = actions.card_use,
 }
 
 local gamepad_map = {

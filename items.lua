@@ -8,7 +8,7 @@ local items = {
   heal_potion = {
     quad = tile_set_grid(8, 1)[1],
     onPickup = function (player)
-      player:addCardToHand(assets.cards.hp)
+      player:addCardToDeck(assets.cards.hp)
       player:setHealth(20)
     end
   }

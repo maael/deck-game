@@ -5,6 +5,21 @@ local Inventory = require('inventory')
 local Player = {}
 Player.__index = Player
 
+local cards = {
+  hp = {
+    img = assets.cards.hp,
+    onPlay = function (player)
+      player:setHealth(20)
+    end
+  },
+  chest = {
+    img = assets.cards.chest
+  },
+  manastorm = {
+    img = assets.cards.manastorm
+  }
+}
+
 function Player.new(world, player_spawn, map)
   local player = {
     name = 'Player',
@@ -29,14 +44,15 @@ function Player.new(world, player_spawn, map)
     debug = false,
     invulnerabe = true,
     map = map,
+    max_hand_size = 5,
     hand = {
-      assets.cards.hp,
-      assets.cards.hp,
-      assets.cards.hp,
-      assets.cards.hp,
-      assets.cards.manastorm,
-      assets.cards.manastorm,
-    }
+      cards.hp,
+      cards.hp,
+      cards.manastorm,
+      cards.manastorm
+    },
+    deck = {cards.hp},
+    discard = {},
   }
   local idle_spritesheet = love.graphics.newImage('assets/spritesheets/knight_idle_spritesheet.png')
   local idle_grid = anim8.newGrid(GRID_SIZE, GRID_SIZE, idle_spritesheet:getWidth(), idle_spritesheet:getHeight())
@@ -59,8 +75,8 @@ function Player:addCardToHand (card)
   table.insert(self.hand, card)
 end
 
-function Player:playCard (idx)
-  table.remove(self.hand, idx)
+function Player:addCardToDeck (card)
+  table.insert(self.deck, card)
 end
 
 function Player:setHealth(modifier)
@@ -71,12 +87,41 @@ function Player:setHealth(modifier)
   end
 end
 
+function shuffleTable (x)
+  local shuffled = {}
+  for i, v in ipairs(x) do
+    local pos = math.random(1, #shuffled+1)
+    table.insert(shuffled, pos, v)
+  end
+  return shuffled
+end
+
 function Player:handlePickup(item)
   if (item.item_type == 'heal_potion') then
-    self:addCardToHand(assets.cards.hp)
+    self:addCardToDeck(cards.hp)
     self:setHealth(20)
   elseif (item.item_type == 'key') then
-    self:addCardToHand(assets.cards.chest)
+    self:addCardToDeck(cards.chest)
+  end
+end
+
+function Player:playCard(card, idx)
+  if (card.onPlay) then
+    card.onPlay(self)
+  end
+  table.insert(self.discard, card)
+  table.remove(self.hand, idx)
+  if (table.getn(self.hand) == 0) then
+    if (table.getn(self.deck) == 0) then
+      self.deck = shuffleTable(self.discard)
+      self.discard = {}
+    end
+    for i=1,self.max_hand_size do
+      local pulled_card = table.remove(self.deck, i)
+      if (pulled_card) then
+        table.insert(self.hand, pulled_card)
+      end
+    end
   end
 end
 
