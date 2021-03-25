@@ -10,13 +10,16 @@ local cards = {
     img = assets.cards.hp,
     onPlay = function (player)
       player:setHealth(20)
-    end
+    end,
+    mana = 3
   },
   chest = {
-    img = assets.cards.chest
+    img = assets.cards.chest,
+    mana = 1
   },
   manastorm = {
-    img = assets.cards.manastorm
+    img = assets.cards.manastorm,
+    mana = 2
   }
 }
 
@@ -44,14 +47,18 @@ function Player.new(world, player_spawn, map)
     debug = false,
     invulnerabe = true,
     map = map,
-    max_hand_size = 5,
+    max_hand_size = 3,
+    max_mana = 3,
+    mana = 2,
+    mana_regen = 1,
+    clock = 0,
     hand = {
       cards.hp,
       cards.hp,
       cards.manastorm,
       cards.manastorm
     },
-    deck = {cards.hp},
+    deck = {cards.manastorm},
     discard = {},
   }
   local idle_spritesheet = love.graphics.newImage('assets/spritesheets/knight_idle_spritesheet.png')
@@ -87,6 +94,10 @@ function Player:setHealth(modifier)
   end
 end
 
+function Player:setMana(modifier)
+  self.mana = math.max(math.min(self.mana + modifier, self.max_mana), 0)
+end
+
 function shuffleTable (x)
   local shuffled = {}
   for i, v in ipairs(x) do
@@ -106,6 +117,11 @@ function Player:handlePickup(item)
 end
 
 function Player:playCard(card, idx)
+  if (self.mana >= card.mana) then
+    self:setMana(-card.mana)
+  else
+    return
+  end
   if (card.onPlay) then
     card.onPlay(self)
   end
@@ -117,9 +133,16 @@ function Player:playCard(card, idx)
       self.discard = {}
     end
     for i=1,self.max_hand_size do
-      local pulled_card = table.remove(self.deck, i)
+      local pulled_card = table.remove(self.deck, 1)
       if (pulled_card) then
         table.insert(self.hand, pulled_card)
+      else
+        self.deck = shuffleTable(self.discard)
+        self.discard = {}
+        local pulled_card = table.remove(self.deck, 1)
+        if (pulled_card) then
+          table.insert(self.hand, pulled_card)
+        end
       end
     end
   end
@@ -138,6 +161,12 @@ function Player:handleInteract()
 end
 
 function Player:update(dt)
+  local original = math.floor(self.clock)
+  self.clock = self.clock + dt
+  local post = math.floor(self.clock)
+  if (original < post) then
+    self:setMana(1)
+  end
   self.sprinting = controls:isActionDown('SPRINT')
   local speed = (self.sprinting and self.sprint_speed or self.speed)
   local x_vel = 0

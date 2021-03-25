@@ -1,4 +1,5 @@
 local DeckHud = require "deck_hud"
+local assets = require "assets"
 local HUD = {}
 HUD.__index = HUD
 
@@ -40,9 +41,22 @@ function HUD:drawHealth()
   end
 end
 
+function HUD:drawMana()
+  for m=1,self.player.max_mana do
+    local icon
+    if (m <= self.player.mana) then
+      icon = assets.items.shard_blue
+    else
+      icon = assets.items.shard_grey
+    end
+    love.graphics.draw(icon, 10 + (20 * (m - 1)), 30)
+  end
+end
+
 function HUD:draw(canvas)
   self.deck_hud:draw()
   self:drawMinimap(canvas)
+  self:drawMana()
   self:drawHealth()
   love.graphics.reset()
 end

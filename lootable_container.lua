@@ -3,7 +3,7 @@ local items = require "items"
 local LootableContainer = {}
 LootableContainer.__index = LootableContainer
 
-function LootableContainer.new(world, x, y, tile_set_img, tile_set_quad, spritesLayer)
+function LootableContainer.new(world, x, y, tile_set_img, tile_set_quad, tile_sets, spritesLayer)
   local lootable_container = {
     world = world,
     is_lootable = true,
@@ -13,6 +13,7 @@ function LootableContainer.new(world, x, y, tile_set_img, tile_set_quad, sprites
     size = GRID_SIZE,
     physics = {},
     spritesLayer = spritesLayer,
+    tile_sets = tile_sets,
     tile_set_img = tile_set_img,
     tile_set_quad = tile_set_quad,
     is_active = true,
@@ -34,7 +35,7 @@ function LootableContainer:handleLoot(player)
   if not self.is_looted then
     self.is_looted = true
     table.insert(self.spritesLayer,
-      InteractiveEntity.new(self.world, self.x, self.y + (GRID_SIZE * 2), 'pickup_item', 'heal_potion', self.tile_set_img,
+      InteractiveEntity.new(self.world, self.x, self.y + (GRID_SIZE * 2), 'pickup_item', 'heal_potion', self.tile_sets['Dungeon Crawler'].image,
         items.heal_potion.quad))
   end
 end

@@ -9,7 +9,7 @@ return {
   tilewidth = 16,
   tileheight = 16,
   nextlayerid = 9,
-  nextobjectid = 74,
+  nextobjectid = 75,
   properties = {},
   tilesets = {
     {
@@ -20,7 +20,7 @@ return {
       spacing = 0,
       margin = 0,
       columns = 9,
-      image = "./dungeon_tiles.png",
+      image = "dungeon_tiles.png",
       imagewidth = 144,
       imageheight = 128,
       objectalignment = "unspecified",
@@ -36,6 +36,32 @@ return {
       properties = {},
       terrains = {},
       tilecount = 72,
+      tiles = {}
+    },
+    {
+      name = "0x72 Dungeon Tiles",
+      firstgid = 73,
+      tilewidth = 16,
+      tileheight = 16,
+      spacing = 0,
+      margin = 0,
+      columns = 32,
+      image = "0x72_dungeon_tiles.png",
+      imagewidth = 512,
+      imageheight = 512,
+      objectalignment = "unspecified",
+      tileoffset = {
+        x = 0,
+        y = 0
+      },
+      grid = {
+        orientation = "orthogonal",
+        width = 16,
+        height = 16
+      },
+      properties = {},
+      terrains = {},
+      tilecount = 1024,
       tiles = {}
     }
   },
@@ -906,6 +932,23 @@ return {
             ["collidable"] = true,
             ["object_type"] = "stairs",
             ["sensor"] = true
+          }
+        },
+        {
+          id = 74,
+          name = "",
+          type = "",
+          shape = "rectangle",
+          x = 575.75,
+          y = 302.5,
+          width = 16,
+          height = 16,
+          rotation = 0,
+          gid = 668,
+          visible = true,
+          properties = {
+            ["custom_collidable"] = true,
+            ["lootable"] = true
           }
         }
       }

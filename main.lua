@@ -102,6 +102,11 @@ function love.load()
     end
   end
 
+  local map_tilesets_by_name = {}
+  for _, set in pairs(map.tilesets) do
+    map_tilesets_by_name[set.name] = set
+  end
+
   -- Process game objects
   local gameObjects = map.layers['GameObjects']
   for _, object in pairs(gameObjects.objects) do
@@ -118,7 +123,7 @@ function love.load()
   for _, object in pairs(persistentGameObjects.objects) do
     if object.properties.lootable then
       table.insert(spriteLayer.sprites,
-        LootableContainer.new(world, object.x, object.y, map.tilesets[map.tiles[object.gid].tileset].image, map.tiles[object.gid].quad, spriteLayer.sprites))
+        LootableContainer.new(world, object.x, object.y, map.tilesets[map.tiles[object.gid].tileset].image, map.tiles[object.gid].quad, map_tilesets_by_name, spriteLayer.sprites))
     else
       table.insert(spriteLayer.sprites,
         InteractiveEntity.new(world, object.x, object.y, object.properties.object_type, object.properties.item_type,
