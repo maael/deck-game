@@ -1,27 +1,9 @@
-local assets = require "assets"
 local anim8 = require('vendor.anim8')
 local controls = require'controls'.get('player')
 local Inventory = require('inventory')
+local cards = require('cards')
 local Player = {}
 Player.__index = Player
-
-local cards = {
-  hp = {
-    img = assets.cards.hp,
-    onPlay = function (player)
-      player:setHealth(20)
-    end,
-    mana = 3
-  },
-  chest = {
-    img = assets.cards.chest,
-    mana = 1
-  },
-  manastorm = {
-    img = assets.cards.manastorm,
-    mana = 2
-  }
-}
 
 function Player.new(world, player_spawn, map)
   local player = {
@@ -105,15 +87,6 @@ function shuffleTable (x)
     table.insert(shuffled, pos, v)
   end
   return shuffled
-end
-
-function Player:handlePickup(item)
-  if (item.item_type == 'heal_potion') then
-    self:addCardToDeck(cards.hp)
-    self:setHealth(20)
-  elseif (item.item_type == 'key') then
-    self:addCardToDeck(cards.chest)
-  end
 end
 
 function Player:playCard(card, idx)

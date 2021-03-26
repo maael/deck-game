@@ -1,9 +1,11 @@
+local items = require "items"
 local InteractiveEntity = {}
 InteractiveEntity.__index = InteractiveEntity
 
 function InteractiveEntity.new(world, x, y, object_type, item_type, tile_set_img, tile_set_quad)
   local color = {191, 191, 191, 0.5}
   local sprite_quad = nil
+  local item = items[item_type]
   local interactive_entity = {
     x = x,
     y = y - GRID_SIZE,
@@ -15,7 +17,8 @@ function InteractiveEntity.new(world, x, y, object_type, item_type, tile_set_img
     object_type = object_type,
     item_type = item_type,
     color = color,
-    sprite_quad = sprite_quad,
+    sprite_quad = item and item.quad or sprite_quad,
+    item = item,
     physics = {},
     debug = false,
     is_active = true,
@@ -48,7 +51,12 @@ function InteractiveEntity:onPickup(player)
   if (not self.is_active) then return end
   if (self.object_type == 'pickup_item') then
     self.is_active = false
-    player:handlePickup(self)
+    if (self.item and self.item.card) then
+      player:addCardToDeck(self.item.card)
+    end
+    if (self.item and self.item.onPickup) then
+      self.item.onPickup(player)
+    end
   elseif (self.object_type == 'stairs') then
     love.event.quit()
   end

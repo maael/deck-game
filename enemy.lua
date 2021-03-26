@@ -54,12 +54,6 @@ function Enemy.new(world, enemy_spawn, player, map, collision_map, pathfinder)
   return enemy
 end
 
-function Enemy:handlePickup(item)
-  if (item.item_type == 'heal_potion') then
-    self.health = math.min(self.health + 20, 100)
-  end
-end
-
 function Enemy:handleCollidePlayer(player)
   player:setHealth(-1)
 end
