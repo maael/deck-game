@@ -53,9 +53,9 @@ function HUD:drawMana()
   end
 end
 
-function HUD:draw(canvas)
+function HUD:draw()
   self.deck_hud:draw()
-  self:drawMinimap(canvas)
+  -- self:drawMinimap(canvas)
   self:drawMana()
   self:drawHealth()
   love.graphics.reset()

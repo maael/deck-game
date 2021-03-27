@@ -1,8 +1,6 @@
 require 'globals'
 local sti = require 'vendor/sti'
-local anim8 = require 'vendor/anim8'
-local serialize = require "vendor.ser"
-local Camera = require 'vendor/STALKER-X/camera'
+local gamera = require ("vendor/gamera")
 local fpsGraph = require 'vendor/FPSGraph'
 local Grid = require ("vendor/jumper.grid")
 local Pathfinder = require ("vendor/jumper.pathfinder")
@@ -13,12 +11,10 @@ local PlayerMenu = require 'player_menu'
 local Enemy = require 'enemy'
 local InteractiveEntity = require 'interactive_entity'
 local LootableContainer = require 'lootable_container'
-local assets = require "assets"
 
 local player
 local hud
 local camera
-local canvas
 local graph
 local player_menu
 
@@ -44,12 +40,9 @@ function love.load()
   map = sti('assets/dungeon.lua', {'box2d'})
   map:box2d_init(world)
 
-  love.window.setMode(CANVAS_WIDTH * CANVAS_SCALE, CANVAS_HEIGHT * CANVAS_SCALE)
-  canvas = love.graphics.newCanvas(CANVAS_WIDTH, CANVAS_HEIGHT)
-  camera = Camera(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, CANVAS_WIDTH, CANVAS_HEIGHT)
-  camera:setBounds(0, 0, map.width * map.tilewidth, map.height * map.tileheight)
-  camera:setFollowStyle('TOPDOWN_TIGHT')
-  camera:setFollowLerp(0.1)
+  local w, h = map.tilewidth * map.width, map.tileheight * map.height
+  camera = gamera.new(0, 0, w, h)
+  camera:setScale(CANVAS_SCALE)
 
   -- Find player spawn point
   local gameObjects = map.layers['GameObjects']
@@ -151,32 +144,20 @@ function love.update(dt)
     world:update(dt)
     map:update(dt)
     controls:update(dt)
-    camera:update(dt)
-    camera:follow(player.x, player.y)
+    camera:setPosition(player.x, player.y)
   end
   fpsGraph.updateFPS(graph, dt)
 end
 
 function love.draw()
-  love.graphics.setCanvas(canvas)
-  love.graphics.clear()
-  camera:attach()
   love.graphics.setColor({255, 255, 255, 1})
-  map:draw(math.floor(-camera.x + CANVAS_WIDTH / 2), math.floor(-camera.y + CANVAS_HEIGHT / 2))
-  -- love.graphics.setColor({255, 0, 0, 1})
-  -- map:box2d_draw()
-  -- love.graphics.setColor({255, 255, 255, 1})
+  camera:draw(function(l, t, w, h)
+    map:draw(-l, -t, CANVAS_SCALE, CANVAS_SCALE)
+  end)
   player_menu:draw()
-  camera:detach()
-  camera:draw()
-  love.graphics.setCanvas()
-  love.graphics.setColor(1, 1, 1, 1)
-  love.graphics.setBlendMode('alpha', 'premultiplied')
-  love.graphics.draw(canvas, 0, 0, 0, CANVAS_SCALE, CANVAS_SCALE)
-  love.graphics.setBlendMode('alpha')
   if (player.is_dead) then
     hud:drawDeathScreen()
   end
-  hud:draw(canvas)
+  hud:draw()
   fpsGraph.drawGraphs({graph})
 end
