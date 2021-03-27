@@ -3,7 +3,7 @@ local items = require "items"
 local LootableContainer = {}
 LootableContainer.__index = LootableContainer
 
-function LootableContainer.new(world, x, y, tile_set_img, tile_set_quad, tile_sets, spritesLayer)
+function LootableContainer.new(world, lightWorld, camera, x, y, tile_set_img, tile_set_quad, tile_sets, spritesLayer)
   local lootable_container = {
     world = world,
     is_lootable = true,
@@ -17,8 +17,11 @@ function LootableContainer.new(world, x, y, tile_set_img, tile_set_quad, tile_se
     tile_set_img = tile_set_img,
     tile_set_quad = tile_set_quad,
     is_active = true,
-    debug = false
+    debug = false,
+    lightWorld = lightWorld,
+    camera = camera
   }
+  lootable_container.light = lightWorld:newLight(lootable_container.x, lootable_container.y, 255, 215, 0, GRID_SIZE * 2)
   setmetatable(lootable_container, LootableContainer)
   lootable_container.physics.body = love.physics.newBody(world, lootable_container.x + (GRID_SIZE / 2),
     lootable_container.y + (0.75 * GRID_SIZE), 'static')
@@ -34,6 +37,7 @@ end
 function LootableContainer:handleLoot(player)
   if not self.is_looted then
     self.is_looted = true
+    self.lightWorld:remove(self.light)
     table.insert(self.spritesLayer,
       InteractiveEntity.new(self.world, self.x, self.y + (GRID_SIZE * 2), 'pickup_item', 'heal_potion', self.tile_sets['Dungeon Crawler'].image,
         items.heal_potion.quad))
@@ -41,6 +45,8 @@ function LootableContainer:handleLoot(player)
 end
 
 function LootableContainer:update(dt)
+  local cam_x, cam_y =  self.camera:toScreen(self.x + (GRID_SIZE / 2), self.y + (GRID_SIZE / 2))
+  self.light:setPosition(cam_x, cam_y)
 end
 
 function LootableContainer:draw()

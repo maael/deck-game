@@ -4,6 +4,7 @@ local gamera = require ("vendor/gamera")
 local fpsGraph = require 'vendor/FPSGraph'
 local Grid = require ("vendor/jumper.grid")
 local Pathfinder = require ("vendor/jumper.pathfinder")
+local LightWorld = require "vendor.light_world"
 local controls = require'controls'.get('player')
 local HUD = require 'hud'
 local Player = require 'player'
@@ -17,6 +18,7 @@ local hud
 local camera
 local graph
 local player_menu
+local lightWorld
 
 function BeginContact(a, b, coll)
   local a_data = a:getUserData()
@@ -55,7 +57,11 @@ function love.load()
     end
   end
 
-  player = Player.new(world, player_spawn, map)
+  lightWorld = LightWorld({
+    ambient = {0,0,0},         --the general ambient light in the environment
+  })
+
+  player = Player.new(world, lightWorld, camera, player_spawn, map)
   player_menu = PlayerMenu.new(player)
   hud = HUD.new(player)
 
@@ -116,7 +122,7 @@ function love.load()
   for _, object in pairs(persistentGameObjects.objects) do
     if object.properties.lootable then
       table.insert(spriteLayer.sprites,
-        LootableContainer.new(world, object.x, object.y, map.tilesets[map.tiles[object.gid].tileset].image, map.tiles[object.gid].quad, map_tilesets_by_name, spriteLayer.sprites))
+        LootableContainer.new(world, lightWorld, camera, object.x, object.y, map.tilesets[map.tiles[object.gid].tileset].image, map.tiles[object.gid].quad, map_tilesets_by_name, spriteLayer.sprites))
     else
       table.insert(spriteLayer.sprites,
         InteractiveEntity.new(world, object.x, object.y, object.properties.object_type, object.properties.item_type,
@@ -146,13 +152,16 @@ function love.update(dt)
     controls:update(dt)
     camera:setPosition(player.x, player.y)
   end
+  lightWorld:update(dt)
   fpsGraph.updateFPS(graph, dt)
 end
 
 function love.draw()
   love.graphics.setColor({255, 255, 255, 1})
   camera:draw(function(l, t, w, h)
-    map:draw(-l, -t, CANVAS_SCALE, CANVAS_SCALE)
+    lightWorld:draw(function()
+      map:draw(-l, -t, CANVAS_SCALE, CANVAS_SCALE)
+    end)
   end)
   player_menu:draw()
   if (player.is_dead) then
