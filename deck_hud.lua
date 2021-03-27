@@ -23,8 +23,8 @@ function DeckHud.new(player)
   controls:addAction('CARD_USE', function ()
     local should_move_selected = deck_hud.selected_card == table.getn(deck_hud.player.hand)
     local playing_card = deck_hud.player.hand[deck_hud.selected_card]
-    player:playCard(playing_card, deck_hud.selected_card)
-    if (should_move_selected) then
+    local play_result = player:playCard(playing_card, deck_hud.selected_card)
+    if (play_result and should_move_selected) then
       local new_selected = deck_hud.selected_card - 1
       if (new_selected > 0) then
         deck_hud.selected_card = deck_hud.selected_card - 1

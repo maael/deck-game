@@ -93,7 +93,7 @@ function Player:playCard(card, idx)
   if (self.mana >= card.mana) then
     self:setMana(-card.mana)
   else
-    return
+    return false
   end
   if (card.onPlay) then
     card.onPlay(self)
@@ -119,6 +119,7 @@ function Player:playCard(card, idx)
       end
     end
   end
+  return true
 end
 
 function Player:handleInteract()
