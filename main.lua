@@ -1,5 +1,4 @@
 require 'globals'
-local fpsGraph = require 'vendor/FPSGraph'
 local controls = require'controls'.get('player')
 local HUD = require 'hud'
 local PlayerMenu = require 'player_menu'
@@ -7,13 +6,11 @@ local PlayerMenu = require 'player_menu'
 local Level = require 'level'
 
 local hud
-local graph
 local player_menu
 
 local level
 
 function love.load()
-  graph = fpsGraph.createGraph(10, 50, 50, 30, 0.5, false)
   level = Level.new('assets/dungeon.lua')
   player_menu = PlayerMenu.new(level.player)
   hud = HUD.new(level.player)
@@ -40,7 +37,7 @@ function love.update(dt)
   end
   level.camera:setScale(CANVAS_SCALE)
   level.camera:setPosition(level.player.x, level.player.y)
-  fpsGraph.updateFPS(graph, dt)
+  hud:update(dt)
 end
 
 function love.draw()
@@ -57,10 +54,6 @@ function love.draw()
       end
     end
   end)
+  hud:draw(level)
   player_menu:draw()
-  if (level.player.is_dead) then
-    hud:drawDeathScreen()
-  end
-  hud:draw()
-  fpsGraph.drawGraphs({graph})
 end

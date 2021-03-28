@@ -1,3 +1,4 @@
+local fpsGraph = require 'vendor/FPSGraph'
 local DeckHud = require "deck_hud"
 local assets = require "assets"
 local HUD = {}
@@ -8,19 +9,8 @@ function HUD.new(player)
   setmetatable(hud, HUD)
   hud.player = player
   hud.deck_hud = DeckHud.new(player)
+  hud.fpsGraph = fpsGraph.createGraph(10, 50, 50, 30, 0.5, false)
   return hud
-end
-
-function HUD:drawMinimap(canvas)
-  local minimap_width, minimap_height = canvas:getWidth() * 0.5, canvas:getHeight() * 0.5
-  local minimap_x, minimap_y = (CANVAS_WIDTH * CANVAS_SCALE) - (minimap_width) - 10, 10
-  love.graphics.setColor(46, 49, 49, 0.5)
-  love.graphics.rectangle('fill', minimap_x - 2, minimap_y - 2, minimap_width + 4, minimap_height + 4, 2, 2)
-  love.graphics.setBlendMode('alpha', 'premultiplied')
-  love.graphics.setColor(0, 0, 0, 0.8)
-  love.graphics.draw(canvas, minimap_x, minimap_y, 0, 0.5, 0.5)
-  love.graphics.setBlendMode('alpha')
-  love.graphics.setColor(255, 255, 255, 1)
 end
 
 function HUD:drawDeathScreen()
@@ -53,12 +43,20 @@ function HUD:drawMana()
   end
 end
 
-function HUD:draw()
+function HUD:update(dt)
+  fpsGraph.updateFPS(self.fpsGraph, dt)
+end
+
+function HUD:draw(level)
   self.deck_hud:draw()
-  -- self:drawMinimap(canvas)
   self:drawMana()
   self:drawHealth()
+  love.graphics.setColor({255, 255, 255, 1})
+  fpsGraph.drawGraphs({self.fpsGraph})
   love.graphics.reset()
+  if (level.player.is_dead) then
+    self:drawDeathScreen()
+  end
 end
 
 return HUD
