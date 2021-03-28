@@ -20,7 +20,7 @@ function InteractiveEntity.new(world, x, y, object_type, item_type, tile_set_img
     sprite_quad = item and item.quad or sprite_quad,
     item = item,
     physics = {},
-    debug = false,
+    debug = DEBUG_GAME_OBJECTS,
     is_active = true,
     tile_set_img = tile_set_img,
     tile_set_quad = tile_set_quad,

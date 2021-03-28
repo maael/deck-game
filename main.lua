@@ -12,8 +12,6 @@ local player_menu
 
 local level
 
-local debug_world = false
-
 function love.load()
   graph = fpsGraph.createGraph(10, 50, 50, 30, 0.5, false)
   level = Level.new()
@@ -49,7 +47,7 @@ function love.draw()
   love.graphics.setColor({255, 255, 255, 1})
   level.camera:draw(function(l, t, w, h)
     level.map:draw(-l, -t, CANVAS_SCALE, CANVAS_SCALE)
-    if (debug_world) then
+    if (DEBUG_WORLD) then
       love.graphics.setColor({255, 0, 0, 1})
       for _, body in pairs(level.world:getBodies()) do
         for _, fixture in pairs(body:getFixtures()) do

@@ -27,7 +27,7 @@ function Player.new(world, camera, player_spawn, map)
     current_direction = 'right',
     current_anim = 'idle',
     is_dead = false,
-    debug = false,
+    debug = DEBUG_PLAYER,
     invulnerabe = true,
     map = map,
     max_hand_size = 3,

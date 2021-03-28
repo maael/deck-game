@@ -17,7 +17,7 @@ function LootableContainer.new(world, camera, x, y, tile_set_img, tile_set_quad,
     tile_set_img = tile_set_img,
     tile_set_quad = tile_set_quad,
     is_active = true,
-    debug = false,
+    debug = DEBUG_GAME_OBJECTS,
     camera = camera
   }
   setmetatable(lootable_container, LootableContainer)

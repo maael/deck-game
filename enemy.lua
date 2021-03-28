@@ -20,7 +20,7 @@ function Enemy.new(world, enemy_spawn, player, map, collision_map, pathfinder)
     collision_x_limit = nil,
     collision_y_limit = nil,
     is_active = true,
-    debug = false,
+    debug = DEBUG_ENEMIES,
     animations = {},
     current_direction = 'right',
     current_anim = 'idle',
