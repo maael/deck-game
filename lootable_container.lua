@@ -3,25 +3,22 @@ local items = require "items"
 local LootableContainer = {}
 LootableContainer.__index = LootableContainer
 
-function LootableContainer.new(world, camera, x, y, tile_set_img, tile_set_quad, tile_sets, spritesLayer)
+function LootableContainer.new(level, x, y, tile_set_img, tile_set_quad)
   local lootable_container = {
-    world = world,
+    level = level,
     is_lootable = true,
     is_looted = false,
     x = x,
     y = y - GRID_SIZE,
     size = GRID_SIZE,
     physics = {},
-    spritesLayer = spritesLayer,
-    tile_sets = tile_sets,
     tile_set_img = tile_set_img,
     tile_set_quad = tile_set_quad,
     is_active = true,
     debug = DEBUG_GAME_OBJECTS,
-    camera = camera
   }
   setmetatable(lootable_container, LootableContainer)
-  lootable_container.physics.body = love.physics.newBody(world, lootable_container.x + (GRID_SIZE / 2),
+  lootable_container.physics.body = love.physics.newBody(level.world, lootable_container.x + (GRID_SIZE / 2),
     lootable_container.y + (0.75 * GRID_SIZE), 'static')
   lootable_container.physics.shape = love.physics.newRectangleShape(0, 0, lootable_container.size,
     lootable_container.size / 2)
@@ -35,8 +32,8 @@ end
 function LootableContainer:handleLoot(player)
   if not self.is_looted then
     self.is_looted = true
-    table.insert(self.spritesLayer,
-      InteractiveEntity.new(self.world, self.x, self.y + (GRID_SIZE * 2), 'pickup_item', 'heal_potion', self.tile_sets['Dungeon Crawler'].image,
+    table.insert(self.level.spriteLayer.sprites,
+      InteractiveEntity.new(self.level, self.x, self.y + (GRID_SIZE * 2), 'pickup_item', 'heal_potion', self.level.map_tilesets_by_name['Dungeon Crawler'].image,
         items.heal_potion.quad))
   end
 end

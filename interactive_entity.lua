@@ -2,7 +2,7 @@ local items = require "items"
 local InteractiveEntity = {}
 InteractiveEntity.__index = InteractiveEntity
 
-function InteractiveEntity.new(world, x, y, object_type, item_type, tile_set_img, tile_set_quad)
+function InteractiveEntity.new(level, x, y, object_type, item_type, tile_set_img, tile_set_quad)
   local color = {191, 191, 191, 0.5}
   local sprite_quad = nil
   local item = items[item_type]
@@ -25,7 +25,7 @@ function InteractiveEntity.new(world, x, y, object_type, item_type, tile_set_img
     tile_set_img = tile_set_img,
     tile_set_quad = tile_set_quad,
   }
-  interactive_entity.physics.body = love.physics.newBody(world, interactive_entity.x + (GRID_SIZE / 2),
+  interactive_entity.physics.body = love.physics.newBody(level.world, interactive_entity.x + (GRID_SIZE / 2),
     interactive_entity.y + (GRID_SIZE / 2), 'static')
   interactive_entity.physics.shape = love.physics.newRectangleShape(0, 0, interactive_entity.size,
     interactive_entity.size)

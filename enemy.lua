@@ -4,7 +4,7 @@ local Inventory = require('inventory')
 local Enemy = {}
 Enemy.__index = Enemy
 
-function Enemy.new(world, enemy_spawn, player, map, collision_map, pathfinder)
+function Enemy.new(level, enemy_spawn)
   local enemy = {
     name = 'Steve',
     health = 100,
@@ -15,7 +15,7 @@ function Enemy.new(world, enemy_spawn, player, map, collision_map, pathfinder)
     sprint_speed = 50,
     sprinting = false,
     inventory = Inventory.new(),
-    world = world,
+    world = level.world,
     physics = {},
     collision_x_limit = nil,
     collision_y_limit = nil,
@@ -24,18 +24,18 @@ function Enemy.new(world, enemy_spawn, player, map, collision_map, pathfinder)
     animations = {},
     current_direction = 'right',
     current_anim = 'idle',
-    player = player,
+    player = level.player,
     vision_range = 100,
     intersect_x = nil,
     intersect_y = nil,
     can_see_player = false,
     player_normal_x = nil,
     player_normal_y = nil,
-    collision_map = collision_map,
-    pathfinder = pathfinder,
+    collision_map = level.collision_map,
+    pathfinder = level.pathfinder,
     path = nil,
     goal = nil,
-    map = map
+    map = level.map
   }
   local idle_spritesheet = love.graphics.newImage('assets/spritesheets/goblin_idle_spritesheet.png')
   local idle_grid = anim8.newGrid(GRID_SIZE, GRID_SIZE, idle_spritesheet:getWidth(), idle_spritesheet:getHeight())
@@ -46,7 +46,7 @@ function Enemy.new(world, enemy_spawn, player, map, collision_map, pathfinder)
   local run_animation = anim8.newAnimation(run_grid('1-6', 1), 0.2)
   enemy.animations.run = {anim = run_animation, sprites = run_spritesheet}
   setmetatable(enemy, Enemy)
-  enemy.physics.body = love.physics.newBody(world, enemy.x, enemy.y, 'dynamic')
+  enemy.physics.body = love.physics.newBody(level.world, enemy.x, enemy.y, 'dynamic')
   enemy.physics.shape = love.physics.newRectangleShape(0, enemy.size / 4, enemy.size, enemy.size / 2)
   enemy.physics.fixture = love.physics.newFixture(enemy.physics.body, enemy.physics.shape)
   enemy.physics.body:setFixedRotation(true)

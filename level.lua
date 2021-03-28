@@ -22,7 +22,6 @@ function Level.new(world_path)
   level:generateCollisionMap()
   level:setupCamera()
   level:getPlayerSpawn()
-  print("Spawning player at", level.player_spawn.x, level.player_spawn.y)
   level.player = Player.new(level.world, level.camera, level.player_spawn, level.map)
   level:processTileMap()
   table.insert(level.spriteLayer.sprites, level.player)
@@ -145,35 +144,26 @@ function Level:placeWorldEdges()
 end
 
 function Level:processGameObjects()
-  local gameObjects = self.map.layers['GameObjects']
+  self:processLayerGameObjects('GameObjects')
+  self:processLayerGameObjects('PersistentGameObjects')
+end
+
+function Level:processLayerGameObjects(layer)
+  local gameObjects = self.map.layers[layer]
   if (gameObjects ~= nil) then
     for _, object in pairs(gameObjects.objects) do
       if object.properties.object_type ~= nil and object.properties.object_type == 'enemy_spawn' then
-        table.insert(self.spriteLayer.sprites, Enemy.new(self.world, {x = object.x, y = object.y}, self.player, self.map, self.collision_map, self.pathfinder))
+        table.insert(self.spriteLayer.sprites, Enemy.new(self, {x = object.x, y = object.y}))
       elseif object.properties.lootable then
           table.insert(self.spriteLayer.sprites,
-            LootableContainer.new(self.world, self.camera, object.x, object.y, self.map.tilesets[self.map.tiles[object.gid].tileset].image, self.map.tiles[object.gid].quad, self.map_tilesets_by_name, self.spriteLayer.sprites))
+            LootableContainer.new(self, object.x, object.y, self.map.tilesets[self.map.tiles[object.gid].tileset].image, self.map.tiles[object.gid].quad))
       elseif object.properties.object_type ~= nil and object.properties.object_type ~= 'player_spawn' then
         table.insert(self.spriteLayer.sprites,
-          InteractiveEntity.new(self.world, object.x, object.y, object.properties.object_type, object.properties.item_type,
+          InteractiveEntity.new(self, object.x, object.y, object.properties.object_type, object.properties.item_type,
             self.map.tilesets[self.map.tiles[object.gid].tileset].image, self.map.tiles[object.gid].quad))
       end
     end
-    self.map:removeLayer('GameObjects')
-  end
-  local persistentGameObjects = self.map.layers['PersistentGameObjects']
-  if (persistentGameObjects ~= nil) then
-    for _, object in pairs(persistentGameObjects.objects) do
-      if object.properties.lootable then
-        table.insert(self.spriteLayer.sprites,
-          LootableContainer.new(self.world, self.camera, object.x, object.y, self.map.tilesets[self.map.tiles[object.gid].tileset].image, self.map.tiles[object.gid].quad, self.map_tilesets_by_name, self.spriteLayer.sprites))
-      else
-        table.insert(self.spriteLayer.sprites,
-          InteractiveEntity.new(self.world, object.x, object.y, object.properties.object_type, object.properties.item_type,
-            self.map.tilesets[self.map.tiles[object.gid].tileset].image, self.map.tiles[object.gid].quad))
-      end
-    end
-    self.map:removeLayer('PersistentGameObjects')
+    self.map:removeLayer(layer)
   end
 end
 

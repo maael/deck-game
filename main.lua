@@ -14,7 +14,7 @@ local level
 
 function love.load()
   graph = fpsGraph.createGraph(10, 50, 50, 30, 0.5, false)
-  level = Level.new('assets/dungeon_ii.lua')
+  level = Level.new('assets/dungeon.lua')
   player_menu = PlayerMenu.new(level.player)
   hud = HUD.new(level.player)
 end
