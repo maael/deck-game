@@ -16,12 +16,12 @@ function DeckHud.new(player)
   end, 'down')
   controls:addAction('CARD_RIGHT', function ()
     local new_selected = deck_hud.selected_card + 1
-    if (new_selected <= table.getn(deck_hud.player.hand)) then
+    if (new_selected <= #deck_hud.player.hand) then
       deck_hud.selected_card = new_selected
     end
   end, 'down')
   controls:addAction('CARD_USE', function ()
-    local should_move_selected = deck_hud.selected_card == table.getn(deck_hud.player.hand)
+    local should_move_selected = deck_hud.selected_card == #deck_hud.player.hand
     local playing_card = deck_hud.player.hand[deck_hud.selected_card]
     local play_result = player:playCard(playing_card, deck_hud.selected_card)
     if (play_result and should_move_selected) then

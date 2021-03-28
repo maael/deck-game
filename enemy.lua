@@ -92,8 +92,8 @@ function Enemy:update(dt)
   elseif (self.goal == nil or self.path == nil) then
     self.goal = nil
     while (self.goal == nil) do
-      local potential_x = math.random(table.getn(self.collision_map[1]))
-      local potential_y = math.random(table.getn(self.collision_map))
+      local potential_x = math.random(#self.collision_map[1])
+      local potential_y = math.random(#self.collision_map)
       local is_walkable = self.collision_map[potential_y][potential_x]
       if (is_walkable == 1) then
         local potential_pixel_x, potential_pixel_y = self.map:convertTileToPixel(potential_x - 1, potential_y - 1)

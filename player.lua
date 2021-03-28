@@ -101,8 +101,8 @@ function Player:playCard(card, idx)
   end
   table.insert(self.discard, card)
   table.remove(self.hand, idx)
-  if (table.getn(self.hand) == 0) then
-    if (table.getn(self.deck) == 0) then
+  if (#self.hand == 0) then
+    if (#self.deck == 0) then
       self.deck = shuffleTable(self.discard)
       self.discard = {}
     end
