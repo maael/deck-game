@@ -70,7 +70,7 @@ function Enemy:update(dt)
   for _, contact in pairs(contacts) do
     local a, b = contact:getFixtures()
     local a_data = a:getUserData()
-    if (a_data.is_player) then
+    if (a_data and a_data.is_player) then
       self:handleCollidePlayer(a_data)
     end
   end
