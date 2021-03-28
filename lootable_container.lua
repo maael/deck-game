@@ -1,3 +1,7 @@
+local Shadows = require("vendor.shadows")
+local LightWorld = require("vendor.shadows.LightWorld")
+local Light = require("shadows.Light")
+local Body = require("shadows.Body")
 local InteractiveEntity = require 'interactive_entity'
 local items = require "items"
 local LootableContainer = {}
@@ -17,6 +21,8 @@ function LootableContainer.new(level, x, y, tile_set_img, tile_set_quad)
     is_active = true,
     debug = DEBUG_GAME_OBJECTS,
   }
+  lootable_container.light = Light:new(level.lights, 100)
+  lootable_container.light:SetColor(218,165,32)
   setmetatable(lootable_container, LootableContainer)
   lootable_container.physics.body = love.physics.newBody(level.world, lootable_container.x + (GRID_SIZE / 2),
     lootable_container.y + (0.75 * GRID_SIZE), 'static')
@@ -39,6 +45,12 @@ function LootableContainer:handleLoot(player)
 end
 
 function LootableContainer:update(dt)
+  if (not self.is_looted) then
+    self.light:SetPosition(self.level.camera:toScreen(self.x + (GRID_SIZE / 2), self.y + (GRID_SIZE / 2)))
+  elseif (self.light) then
+    self.light:Remove()
+    self.light = nil
+  end
 end
 
 function LootableContainer:draw()

@@ -1,3 +1,4 @@
+local Light = require("shadows.Light")
 local items = require "items"
 local InteractiveEntity = {}
 InteractiveEntity.__index = InteractiveEntity
@@ -7,6 +8,7 @@ function InteractiveEntity.new(level, x, y, object_type, item_type, tile_set_img
   local sprite_quad = nil
   local item = items[item_type]
   local interactive_entity = {
+    level = level,
     x = x,
     y = y - GRID_SIZE,
     base_y = y - GRID_SIZE,
@@ -25,6 +27,10 @@ function InteractiveEntity.new(level, x, y, object_type, item_type, tile_set_img
     tile_set_img = tile_set_img,
     tile_set_quad = tile_set_quad,
   }
+  if (object_type == 'pickup_item') then
+    interactive_entity.light = Light:new(level.lights, GRID_SIZE * 2.5)
+    interactive_entity.light:SetColor(255,255,255)
+  end
   interactive_entity.physics.body = love.physics.newBody(level.world, interactive_entity.x + (GRID_SIZE / 2),
     interactive_entity.y + (GRID_SIZE / 2), 'static')
   interactive_entity.physics.shape = love.physics.newRectangleShape(0, 0, interactive_entity.size,
@@ -44,12 +50,20 @@ function InteractiveEntity:update(dt)
     if (self.y >= self.base_y or self.y <= self.base_y - self.bounce_height) then
       self.bounce_direction = -self.bounce_direction
     end
+    if (self.light) then
+      self.light:SetPosition(self.level.camera:toScreen(self.x + (GRID_SIZE / 2), self.y + (GRID_SIZE / 2)))
+      self.light:SetRadius(self.light:GetRadius() + (self.bounce_direction * dt * self.bounce_speed * 2))
+    end
   end
 end
 
 function InteractiveEntity:onPickup(player)
   if (not self.is_active) then return end
   if (self.object_type == 'pickup_item') then
+    if (self.light) then
+      self.light:Remove()
+      self.light = nil
+    end
     self.is_active = false
     if (self.item and self.item.card) then
       player:addCardToDeck(self.item.card)

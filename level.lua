@@ -1,3 +1,5 @@
+require("vendor.shadows")
+local LightWorld = require("vendor.shadows.LightWorld")
 local gamera = require "vendor.gamera"
 local sti = require "vendor.sti"
 local Grid = require "vendor.jumper.grid"
@@ -22,8 +24,11 @@ function Level.new(world_path)
   level:generateCollisionMap()
   level:setupCamera()
   level:getPlayerSpawn()
-  level.player = Player.new(level.world, level.camera, level.player_spawn, level.map)
+  level.lights = LightWorld:new()
+  level.player = Player.new(level, level.player_spawn)
   level:processTileMap()
+  -- TODO: This doesn't seem to scale right
+  -- level.lights:InitFromPhysics(level.world)
   table.insert(level.spriteLayer.sprites, level.player)
   return level
 end
@@ -104,7 +109,7 @@ function Level:extractTileMapTileSets()
 end
 
 function Level:attachSpriteLayer()
-  self.map:addCustomLayer('Sprites', 3)
+  self.map:addCustomLayer('Sprites', 6) -- Dungeon = 6, dungeon_ii = 3
   self.spriteLayer = self.map.layers['Sprites']
   self.spriteLayer.sprites = {}
   function self.spriteLayer:update(dt)

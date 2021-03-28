@@ -38,12 +38,14 @@ function love.update(dt)
   level.camera:setScale(CANVAS_SCALE)
   level.camera:setPosition(level.player.x, level.player.y)
   hud:update(dt)
+  level.lights:Update()
 end
 
 function love.draw()
   love.graphics.setColor({255, 255, 255, 1})
   level.camera:draw(function(l, t, w, h)
     level.map:draw(-l, -t, CANVAS_SCALE, CANVAS_SCALE)
+    level.lights:Draw()
     if (DEBUG_WORLD) then
       love.graphics.setColor({255, 0, 0, 1})
       for _, body in pairs(level.world:getBodies()) do

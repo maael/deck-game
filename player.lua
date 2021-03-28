@@ -1,13 +1,15 @@
 local anim8 = require('vendor.anim8')
+local Star = require("shadows.Star")
 local controls = require'controls'.get('player')
 local Inventory = require('inventory')
 local cards = require('cards')
 local Player = {}
 Player.__index = Player
 
-function Player.new(world, camera, player_spawn, map)
+function Player.new(level, player_spawn)
   local player = {
-    camera = camera,
+    level = level,
+    camera = level.camera,
     name = 'Player',
     is_player = true,
     health = 100,
@@ -18,7 +20,7 @@ function Player.new(world, camera, player_spawn, map)
     sprint_speed = 200,
     sprinting = false,
     inventory = Inventory.new(),
-    world = world,
+    world = level.world,
     physics = {},
     collision_x_limit = nil,
     collision_y_limit = nil,
@@ -29,7 +31,7 @@ function Player.new(world, camera, player_spawn, map)
     is_dead = false,
     debug = DEBUG_PLAYER,
     invulnerabe = true,
-    map = map,
+    map = level.map,
     max_hand_size = 3,
     max_mana = 3,
     mana = 2,
@@ -44,6 +46,7 @@ function Player.new(world, camera, player_spawn, map)
     deck = {cards.manastorm},
     discard = {},
   }
+  player.light = Star:new(level.lights, (CANVAS_WIDTH * CANVAS_SCALE) * 0.8)
   local idle_spritesheet = love.graphics.newImage('assets/spritesheets/knight_idle_spritesheet.png')
   local idle_grid = anim8.newGrid(GRID_SIZE, GRID_SIZE, idle_spritesheet:getWidth(), idle_spritesheet:getHeight())
   local idle_animation = anim8.newAnimation(idle_grid('1-6', 1), 0.2)
@@ -53,7 +56,7 @@ function Player.new(world, camera, player_spawn, map)
   local run_animation = anim8.newAnimation(run_grid('1-6', 1), 0.2)
   player.animations.run = {anim = run_animation, sprites = run_spritesheet}
   setmetatable(player, Player)
-  player.physics.body = love.physics.newBody(world, player.x, player.y, 'dynamic')
+  player.physics.body = love.physics.newBody(level.world, player.x, player.y, 'dynamic')
   player.physics.shape = love.physics.newRectangleShape(0, player.size / 4, player.size, player.size / 2)
   player.physics.fixture = love.physics.newFixture(player.physics.body, player.physics.shape)
   player.physics.body:setFixedRotation(true)
@@ -175,6 +178,8 @@ function Player:update(dt)
   self.x = self.physics.body:getX()
   self.y = self.physics.body:getY()
   self.animations[self.current_anim].anim:update(dt)
+  local cam_x, cam_y = self.level.camera:toScreen(self.x, self.y)
+  self.light:SetPosition(cam_x, cam_y)
 end
 
 function Player:draw()
