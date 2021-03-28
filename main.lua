@@ -1,4 +1,5 @@
 require 'globals'
+local assets = require 'assets'
 local controls = require'controls'.get('player')
 local HUD = require 'hud'
 local PlayerMenu = require 'player_menu'
@@ -11,6 +12,8 @@ local player_menu
 local level
 
 function love.load()
+  love.graphics.setDefaultFilter('nearest', 'nearest')
+  love.graphics.setFont(assets.fonts.default)
   level = Level.new('assets/dungeon.lua')
   player_menu = PlayerMenu.new(level.player)
   hud = HUD.new(level.player)

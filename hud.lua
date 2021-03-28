@@ -53,7 +53,6 @@ function HUD:draw(level)
   self:drawHealth()
   love.graphics.setColor({255, 255, 255, 1})
   fpsGraph.drawGraphs({self.fpsGraph})
-  love.graphics.reset()
   if (level.player.is_dead) then
     self:drawDeathScreen()
   end

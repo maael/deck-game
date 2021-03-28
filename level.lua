@@ -18,7 +18,6 @@ function Level.new(world_path)
     world_path = world_path
   }
   setmetatable(level, Level)
-  love.graphics.setDefaultFilter('nearest', 'nearest')
   level:setupPhysicsWorld()
   level:setupTileMap()
   level:generateCollisionMap()
