@@ -1,4 +1,4 @@
-local fpsGraph = require 'vendor/FPSGraph'
+local fpsGraph = require 'vendor.FPSGraph'
 local DeckHud = require "deck_hud"
 local assets = require "assets"
 local HUD = {}
