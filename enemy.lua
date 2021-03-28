@@ -124,7 +124,7 @@ function Enemy:update(dt)
   local normalised_x = 0
   local normalised_y = 0
   if (self.path and self.path[2]) then
-    local path_pix_x, path_pix_y = map:convertTileToPixel(self.path[2].x, self.path[2].y)
+    local path_pix_x, path_pix_y = self.map:convertTileToPixel(self.path[2].x, self.path[2].y)
     local diff_x = math.floor(self.x - (path_pix_x + (GRID_SIZE / 2)))
     local diff_y = math.floor(self.y - (path_pix_y + (GRID_SIZE / 2)))
     normalised_x = diff_x < 0 and 1 or diff_x == 0 and 0 or -1
@@ -179,7 +179,7 @@ function Enemy:checkPlayerVisibility()
       end
     end
     -- Set intersection point if active, and include if it's the player or not
-    if (closest and closest.data.is_active) then
+    if (closest and closest.data and closest.data.is_active) then
       self.can_see_player = closest.data.is_player
       self.player_normal_x = closest.xn
       self.player_normal_y = closest.yn

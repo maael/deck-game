@@ -4,7 +4,6 @@ local gamera = require ("vendor/gamera")
 local fpsGraph = require 'vendor/FPSGraph'
 local Grid = require ("vendor/jumper.grid")
 local Pathfinder = require ("vendor/jumper.pathfinder")
-local LightWorld = require "vendor.light_world"
 local controls = require'controls'.get('player')
 local HUD = require 'hud'
 local Player = require 'player'
@@ -18,12 +17,16 @@ local hud
 local camera
 local graph
 local player_menu
-local lightWorld
+local collision_map
+local world
+local map
+
+local debug_world = false
 
 function BeginContact(a, b, coll)
   local a_data = a:getUserData()
   local b_data = b:getUserData()
-  if (a_data.is_player and a_data.is_active) then
+  if (a_data and a_data.is_player and a_data.is_active and b_data) then
     if (b_data.handleCollidePlayer and b_data.is_active) then
       b_data:handleCollidePlayer(a_data)
     elseif (b_data.onPickup and b_data.is_active) then
@@ -57,17 +60,13 @@ function love.load()
     end
   end
 
-  lightWorld = LightWorld({
-    ambient = {0,0,0},         --the general ambient light in the environment
-  })
-
-  player = Player.new(world, lightWorld, camera, player_spawn, map)
+  player = Player.new(world, camera, player_spawn, map)
   player_menu = PlayerMenu.new(player)
   hud = HUD.new(player)
 
   -- Create collision map for path finding
   -- TODO: Seems to be off by one or something
-  local collision_map = {}
+  collision_map = {}
   local walkable = 1
   for y = 1, map.height do
     collision_map[y] = {}
@@ -80,7 +79,7 @@ function love.load()
 
   -- Add Player to custom layer in map
   -- This is the secret sauce that makes collisions work properly
-  map:addCustomLayer('Sprites', 7)
+  map:addCustomLayer('Sprites', 6)
   local spriteLayer = map.layers['Sprites']
   spriteLayer.sprites = {player}
   function spriteLayer:update(dt)
@@ -122,7 +121,7 @@ function love.load()
   for _, object in pairs(persistentGameObjects.objects) do
     if object.properties.lootable then
       table.insert(spriteLayer.sprites,
-        LootableContainer.new(world, lightWorld, camera, object.x, object.y, map.tilesets[map.tiles[object.gid].tileset].image, map.tiles[object.gid].quad, map_tilesets_by_name, spriteLayer.sprites))
+        LootableContainer.new(world, camera, object.x, object.y, map.tilesets[map.tiles[object.gid].tileset].image, map.tiles[object.gid].quad, map_tilesets_by_name, spriteLayer.sprites))
     else
       table.insert(spriteLayer.sprites,
         InteractiveEntity.new(world, object.x, object.y, object.properties.object_type, object.properties.item_type,
@@ -130,6 +129,22 @@ function love.load()
     end
   end
   map:removeLayer('PersistentGameObjects')
+
+  -- Process edge of floor for collisions
+  for y, row in pairs(collision_map) do
+    for x, tile in pairs(row) do
+      local up = (collision_map[y - 1] or {})[x] or 0
+      local down = (collision_map[y + 1] or {})[x] or 0
+      local left = collision_map[y][x - 1] or 0
+      local right = collision_map[y][x + 1] or 0
+      if (tile == 0 and (up + down + left + right > 0)) then
+        local body = love.physics.newBody(world, (x - 1) * GRID_SIZE, (y - 1) * GRID_SIZE, 'static')
+        local shape = love.physics.newRectangleShape((GRID_SIZE / 2), (GRID_SIZE / 2), GRID_SIZE, GRID_SIZE)
+        love.physics.newFixture(body, shape)
+        body:setFixedRotation(true)
+      end
+    end
+  end
 end
 
 function love.keypressed(key)
@@ -150,18 +165,25 @@ function love.update(dt)
     world:update(dt)
     map:update(dt)
     controls:update(dt)
-    camera:setPosition(player.x, player.y)
   end
-  lightWorld:update(dt)
+  camera:setScale(CANVAS_SCALE)
+  camera:setPosition(player.x, player.y)
   fpsGraph.updateFPS(graph, dt)
 end
 
 function love.draw()
   love.graphics.setColor({255, 255, 255, 1})
   camera:draw(function(l, t, w, h)
-    lightWorld:draw(function()
-      map:draw(-l, -t, CANVAS_SCALE, CANVAS_SCALE)
-    end)
+    map:draw(-l, -t, CANVAS_SCALE, CANVAS_SCALE)
+    if (debug_world) then
+      love.graphics.setColor({255, 0, 0, 1})
+      for _, body in pairs(world:getBodies()) do
+        for _, fixture in pairs(body:getFixtures()) do
+          local shape = fixture:getShape()
+          love.graphics.polygon("line", body:getWorldPoints(shape:getPoints()))
+        end
+      end
+    end
   end)
   player_menu:draw()
   if (player.is_dead) then

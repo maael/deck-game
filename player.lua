@@ -5,7 +5,7 @@ local cards = require('cards')
 local Player = {}
 Player.__index = Player
 
-function Player.new(world, lightWorld, camera, player_spawn, map)
+function Player.new(world, camera, player_spawn, map)
   local player = {
     camera = camera,
     name = 'Player',
@@ -44,7 +44,6 @@ function Player.new(world, lightWorld, camera, player_spawn, map)
     deck = {cards.manastorm},
     discard = {},
   }
-  player.light = lightWorld:newLight(player.x, player.y, 255, 255, 255, 300)
   local idle_spritesheet = love.graphics.newImage('assets/spritesheets/knight_idle_spritesheet.png')
   local idle_grid = anim8.newGrid(GRID_SIZE, GRID_SIZE, idle_spritesheet:getWidth(), idle_spritesheet:getHeight())
   local idle_animation = anim8.newAnimation(idle_grid('1-6', 1), 0.2)
@@ -129,7 +128,7 @@ function Player:handleInteract()
     function(fixture)
       local should_continue_search = true
       local data = fixture:getUserData()
-      if (data.is_lootable and data.handleLoot) then
+      if (data and data.is_lootable and data.handleLoot) then
         data:handleLoot(self)
       end
       return should_continue_search
@@ -176,8 +175,6 @@ function Player:update(dt)
   self.x = self.physics.body:getX()
   self.y = self.physics.body:getY()
   self.animations[self.current_anim].anim:update(dt)
-  local cam_x, cam_y =  self.camera:toScreen(self.x, self.y)
-  self.light:setPosition(cam_x, cam_y)
 end
 
 function Player:draw()
