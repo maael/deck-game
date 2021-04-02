@@ -1,3 +1,6 @@
+
+local game_state = require 'game_state'
+
 local actions = {
   up = 'UP',
   down = 'DOWN',
@@ -42,11 +45,12 @@ local InputController = {}
 InputController.__index = InputController
 local cached = {}
 
-function InputController.new(name)
+function InputController.new(name, required_game_state)
   local controller = {}
   setmetatable(controller, InputController)
   controller.name = name
   controller.actions = actions
+  controller.game_state = required_game_state
   controller.action_map = {}
   controller.release_action_map = {}
   controller.down_action_map = {}
@@ -55,10 +59,10 @@ function InputController.new(name)
   return controller
 end
 
-function InputController.get(name)
+function InputController.get(name, required_game_state)
   name = name or 'DEFAULT'
   if cached[name] == nil then
-    cached[name] = InputController.new(name)
+    cached[name] = InputController.new(name, required_game_state)
   end
   return cached[name]
 end
@@ -125,14 +129,20 @@ function InputController:update(dt)
       if not self:wasKeyDown(key, false) then
         table.insert(self.wasDown, key)
         if (self.down_action_map[action]) then
-          self.down_action_map[action](dt)
+          if (self.game_state == game_state.state) then
+            self.down_action_map[action](dt)
+          end
         end
       end
       if (self.action_map[action]) then
-        self.action_map[action](dt)
+        if (self.game_state == game_state.state) then
+          self.action_map[action](dt)
+        end
       end
     elseif self.release_action_map[action] and self:wasKeyDown(key, true) then
-      self.release_action_map[action](dt)
+      if (self.game_state == game_state.state) then
+        self.release_action_map[action](dt)
+      end
     else
       self:wasKeyDown(key, true)
     end

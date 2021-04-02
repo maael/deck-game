@@ -1,4 +1,4 @@
-local controls = require'controls'.get('player')
+local controls = require'controls'.get('player', 'playing')
 local assets = require'assets'
 local DeckHud = {}
 DeckHud.__index = DeckHud

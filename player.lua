@@ -1,8 +1,10 @@
 local anim8 = require('vendor.anim8')
+require("vendor.shadows")
 local Star = require("shadows.Star")
-local controls = require'controls'.get('player')
+local controls = require'controls'.get('player', 'playing')
 local Inventory = require('inventory')
 local cards = require('cards')
+local game_state = require "game_state"
 local Player = {}
 Player.__index = Player
 
@@ -45,7 +47,11 @@ function Player.new(level, player_spawn)
     },
     deck = {cards.manastorm},
     discard = {},
+    controls = controls
   }
+  player.controls:addAction('ESCAPE', function()
+    game_state.state = 'paused'
+  end, 'down')
   player.light = Star:new(level.lights, (CANVAS_WIDTH * CANVAS_SCALE) * 0.8)
   local idle_spritesheet = love.graphics.newImage('assets/spritesheets/knight_idle_spritesheet.png')
   local idle_grid = anim8.newGrid(GRID_SIZE, GRID_SIZE, idle_spritesheet:getWidth(), idle_spritesheet:getHeight())
@@ -55,12 +61,12 @@ function Player.new(level, player_spawn)
   local run_grid = anim8.newGrid(GRID_SIZE, GRID_SIZE, run_spritesheet:getWidth(), run_spritesheet:getHeight())
   local run_animation = anim8.newAnimation(run_grid('1-6', 1), 0.2)
   player.animations.run = {anim = run_animation, sprites = run_spritesheet}
-  setmetatable(player, Player)
   player.physics.body = love.physics.newBody(level.world, player.x, player.y, 'dynamic')
   player.physics.shape = love.physics.newRectangleShape(0, player.size / 4, player.size, player.size / 2)
   player.physics.fixture = love.physics.newFixture(player.physics.body, player.physics.shape)
   player.physics.body:setFixedRotation(true)
   player.physics.fixture:setUserData(player)
+  setmetatable(player, Player)
   return player
 end
 

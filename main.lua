@@ -1,8 +1,9 @@
 require 'globals'
 local assets = require 'assets'
-local controls = require'controls'.get('player')
 local HUD = require 'hud'
 local PlayerMenu = require 'player_menu'
+local game_state = require 'game_state'
+local player = require "player"
 
 local Level = require 'level'
 
@@ -20,12 +21,12 @@ function love.load()
 end
 
 function love.keypressed(key)
-  controls:handlePressed('keyboard', key)
+  level.player.controls:handlePressed('keyboard', key)
   player_menu.controls:handlePressed('keyboard', key)
 end
 
 function love.gamepadpressed(key)
-  controls:handlePressed('gamepad', key)
+  level.player.controls:handlePressed('gamepad', key)
   player_menu.controls:handlePressed('gamepad', key)
 end
 
@@ -33,10 +34,10 @@ function love.update(dt)
   love.window.setTitle('DeckGame v0.0.1 (FPS: ' .. love.timer.getFPS() .. ')')
   player_menu:update(dt)
   player_menu.controls:update(dt)
-  if (not player_menu.is_open) then
+  if (game_state.state ~= 'paused') then
     level.world:update(dt)
     level.map:update(dt)
-    controls:update(dt)
+    level.player.controls:update(dt)
   end
   level.camera:setScale(CANVAS_SCALE)
   level.camera:setPosition(level.player.x, level.player.y)
