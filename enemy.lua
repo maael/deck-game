@@ -1,5 +1,4 @@
 local anim8 = require('vendor.anim8')
-local serialize = require('vendor.ser')
 local Inventory = require('inventory')
 local Enemy = {}
 Enemy.__index = Enemy
@@ -7,6 +6,7 @@ Enemy.__index = Enemy
 function Enemy.new(level, enemy_spawn)
   local enemy = {
     name = 'Steve',
+    type = 'enemy',
     health = 100,
     x = enemy_spawn.x,
     y = enemy_spawn.y,
@@ -35,7 +35,8 @@ function Enemy.new(level, enemy_spawn)
     pathfinder = level.pathfinder,
     path = nil,
     goal = nil,
-    map = level.map
+    map = level.map,
+    level = level,
   }
   local idle_spritesheet = love.graphics.newImage('assets/spritesheets/goblin_idle_spritesheet.png')
   local idle_grid = anim8.newGrid(GRID_SIZE, GRID_SIZE, idle_spritesheet:getWidth(), idle_spritesheet:getHeight())
@@ -155,6 +156,14 @@ function Enemy:update(dt)
   self.x = self.physics.body:getX();
   self.y = self.physics.body:getY();
   self.animations[self.current_anim].anim:update(dt)
+end
+
+function Enemy:setHealth(modifier)
+  self.health = math.max(math.min(self.health + modifier, 100), 0)
+  if (self.health == 0 and not self.invulnerabe) then
+    self.is_dead = true
+    self.is_active = false
+  end
 end
 
 function Enemy:checkPlayerVisibility()

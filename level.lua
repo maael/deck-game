@@ -41,6 +41,8 @@ function Level.handleCollision (a, b, coll)
     elseif (b_data.onPickup and b_data.is_active) then
       b_data:onPickup(a_data)
     end
+  elseif (a_data and b_data and a_data.type == 'enemy' and b_data.type  == 'player_effect') then
+    b_data.onCollide(a_data, b_data)
   end
 end
 

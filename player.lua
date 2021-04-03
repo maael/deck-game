@@ -40,12 +40,11 @@ function Player.new(level, player_spawn)
     mana_regen = 1,
     clock = 0,
     hand = {
-      cards.hp,
-      cards.hp,
+      cards.manastorm,
       cards.manastorm,
       cards.manastorm
     },
-    deck = {cards.manastorm},
+    deck = {cards.manastorm, cards.hp},
     discard = {},
     controls = controls
   }
@@ -66,6 +65,7 @@ function Player.new(level, player_spawn)
   player.physics.fixture = love.physics.newFixture(player.physics.body, player.physics.shape)
   player.physics.body:setFixedRotation(true)
   player.physics.fixture:setUserData(player)
+  player.effects = {}
   setmetatable(player, Player)
   return player
 end
@@ -184,16 +184,26 @@ function Player:update(dt)
   self.x = self.physics.body:getX()
   self.y = self.physics.body:getY()
   self.animations[self.current_anim].anim:update(dt)
+  local active_effects  = {}
+  for i, effect in pairs(self.effects) do
+    if (effect.anim.status ~= 'paused') then
+      table.insert(active_effects, effect)
+      effect.update(dt, effect, self)
+    end
+  end
+  self.effects = active_effects
   local cam_x, cam_y = self.level.camera:toScreen(self.x, self.y)
   self.light:SetPosition(cam_x, cam_y)
 end
 
-function Player:draw()
-  love.graphics.push()
-  local direction_modifier = self.current_direction == 'right' and 1 or -1
-  love.graphics.setColor({255, 255, 255, 1})
-  self.animations[self.current_anim].anim:draw(self.animations[self.current_anim].sprites, self.x, self.y, 0,
-    direction_modifier, 1, self.size / 2, self.size / 2)
+function Player:drawEffects (direction_modifier)
+  for i, effect in pairs(self.effects) do
+    effect.anim:draw(effect.image, self.x, self.y - (effect.image:getHeight() / 4), 0,
+      direction_modifier, 1, self.size / 2, self.size / 2)
+  end
+end
+
+function Player:drawDebug ()
   if (self.debug) then
     love.graphics.setColor(255, 0, 0, 1);
     love.graphics.polygon('line', self.physics.body:getWorldPoints(self.physics.shape:getPoints()))
@@ -204,7 +214,26 @@ function Player:draw()
     love.graphics.points(self.x + GRID_SIZE, self.y + GRID_SIZE)
     love.graphics.setColor(0, 0, 255, 1)
     love.graphics.points(self.x, self.y)
+    -- Debug effects
+    for i, effect in pairs(self.effects) do
+      love.graphics.setColor(255, 0, 0, 1);
+      love.graphics.polygon('line', effect.physics.body:getWorldPoints(effect.physics.shape:getPoints()))
+    end
   end
+end
+
+function Player:drawPlayer (direction_modifier)
+  self.animations[self.current_anim].anim:draw(self.animations[self.current_anim].sprites, self.x, self.y, 0,
+    direction_modifier, 1, self.size / 2, self.size / 2)
+end
+
+function Player:draw()
+  love.graphics.push()
+  local direction_modifier = self.current_direction == 'right' and 1 or -1
+  love.graphics.setColor({255, 255, 255, 1})
+  self:drawPlayer(direction_modifier)
+  self:drawEffects(direction_modifier)
+  self:drawDebug()
   love.graphics.pop()
 end
 
