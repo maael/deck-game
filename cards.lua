@@ -93,12 +93,12 @@ local cards = {
       effect.type = 'player_effect'
       effect.attached = true
       effect.is_active = true
-      effect.image = assets.animations.effect.bolt_white.image
-      effect.anim = assets.animations.effect.bolt_white.anim:clone()
+      effect.image = assets.items.pearl_blue
       effect.physics = {}
       effect.direction = player.current_direction
       effect.source = player
       effect.damage = 50
+      effect.bullets = {}
       effect.onCollideEnemy = function (enemy, effect)
         if (effect.is_active) then
           enemy:setHealth(-effect.damage)
@@ -109,23 +109,34 @@ local cards = {
           effect.is_active = false
         end
       end
-      effect.onUpdate = function (dt, player, effect)
-        effect.anim:update(dt)
-      end
       effect.onDraw = function (player, effect)
-        local direction_modifier = player.current_direction == 'right' and 1 or -1
-        effect.anim:draw(effect.image, effect.physics.body:getX(), effect.physics.body:getY(), 0,
-          direction_modifier, 1, player.size / 2, player.size / 2)
+        for i, bullet in pairs(effect.bullets) do
+          if (bullet.is_active) then
+            love.graphics.draw(effect.image, bullet.physics.body:getX(), bullet.physics.body:getY(), 0,
+            0.25, 0.25)
+          end
+        end
       end
-      local anim_w, anim_h = effect.anim:getDimensions()
-      local direction_modifier = player.current_direction == 'right' and 1 or -1
-      effect.physics.body = love.physics.newBody(player.world, player.x, player.y, 'dynamic')
-      effect.physics.shape = love.physics.newRectangleShape(anim_w / 4, anim_h / 4, anim_w / 2, anim_h / 4)
-      effect.physics.fixture = love.physics.newFixture(effect.physics.body, effect.physics.shape)
-      effect.physics.body:setFixedRotation(true)
-      effect.physics.fixture:setUserData(effect)
-      effect.physics.fixture:setSensor(true)
-      effect.physics.body:setLinearVelocity(direction_modifier * 100, 0)
+      for i = 1, 5, 1 do
+        local bullet = {
+          type = effect.type,
+          damage = effect.damage,
+          is_active = true,
+          physics = {},
+          bullet_idx = i,
+          onCollideEnemy = effect.onCollideEnemy,
+          onCollideNotPlayer = effect.onCollideNotPlayer,
+        }
+        local direction_modifier = player.current_direction == 'right' and 1 or -1
+        bullet.physics.body = love.physics.newBody(player.world, player.x, player.y + ((i - 3) * 5), 'dynamic')
+        bullet.physics.shape = love.physics.newRectangleShape(effect.image:getWidth() / 8, effect.image:getHeight() / 8, effect.image:getWidth() / 4, effect.image:getHeight() / 4)
+        bullet.physics.fixture = love.physics.newFixture(bullet.physics.body, bullet.physics.shape)
+        bullet.physics.body:setFixedRotation(true)
+        bullet.physics.fixture:setUserData(bullet)
+        bullet.physics.fixture:setSensor(true)
+        bullet.physics.body:setLinearVelocity(direction_modifier * 100, 0)
+        table.insert(effect.bullets, bullet)
+      end
       table.insert(player.level.spriteLayer.sprites, effect)
     end
   }

@@ -16,6 +16,8 @@ local assets = {
     shard_blue = love.graphics.newImage('assets/sprites/kyrises/shard_01c.png'),
     shard_grey = love.graphics.newImage('assets/sprites/kyrises/shard_01e.png'),
     arrow_sm_blue = love.graphics.newImage('assets/sprites/kyrises/arrow_01c.png'),
+    pearl_grey = love.graphics.newImage('assets/sprites/kyrises/pearl_01a.png'),
+    pearl_blue = love.graphics.newImage('assets/sprites/kyrises/pearl_01b.png')
   },
   fonts = {
     default = love.graphics.newFont('assets/fonts/GoldBox.ttf')
