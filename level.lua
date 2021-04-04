@@ -41,8 +41,17 @@ function Level.handleCollision (a, b, coll)
     elseif (b_data.onPickup and b_data.is_active) then
       b_data:onPickup(a_data)
     end
-  elseif (a_data and b_data and a_data.type == 'enemy' and b_data.type  == 'player_effect') then
-    b_data.onCollide(a_data, b_data)
+  elseif (a_data and b_data and a_data.type == 'enemy' and b_data.type  == 'player_effect' and b_data.onCollideEnemy ~= nil) then
+    b_data.onCollideEnemy(a_data, b_data)
+  end
+  if ((a_data == nil or a_data.type ~= 'player') and b_data and b_data.onCollideNotPlayer) then
+    b_data.onCollideNotPlayer(b_data, a, a_data)
+  end
+  if (a_data and a_data.type == 'player_effect' and a_data.onCollideAny ~= nil) then
+    a_data.onCollideAny(a_data)
+  end
+  if (b_data and b_data.type == 'player_effect' and b_data.onCollideAny ~= nil) then
+    b_data.onCollideAny(b_data)
   end
 end
 
@@ -114,13 +123,20 @@ function Level:attachSpriteLayer()
   self.spriteLayer = self.map.layers['Sprites']
   self.spriteLayer.sprites = {}
   function self.spriteLayer:update(dt)
+    local active_sprites = {}
     for _, sprite in pairs(self.sprites) do
       if sprite.is_active then
         sprite:update(dt)
+        table.insert(active_sprites, sprite)
       end
     end
+    self.sprites = active_sprites
     table.sort(self.sprites, function (a, b)
-      return (a.y + GRID_SIZE) < b.y
+      if (a.y and b.y) then
+        return (a.y + GRID_SIZE) < b.y
+      else
+        return false
+      end
     end)
   end
   function self.spriteLayer:draw()

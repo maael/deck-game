@@ -6,6 +6,7 @@ local assets = {
     dungeon_ii = love.graphics.newImage("assets/0x72_dungeon_tiles.png"),
   },
   cards = {
+    artifact = love.graphics.newImage('assets/sprites/cards/artifact.PNG'),
     hp = love.graphics.newImage('assets/sprites/cards/HP.PNG'),
     manastorm = love.graphics.newImage('assets/sprites/cards/mana_storm.PNG'),
     stoneskin = love.graphics.newImage('assets/sprites/cards/stoneskin.PNG'),
@@ -14,6 +15,7 @@ local assets = {
   items = {
     shard_blue = love.graphics.newImage('assets/sprites/kyrises/shard_01c.png'),
     shard_grey = love.graphics.newImage('assets/sprites/kyrises/shard_01e.png'),
+    arrow_sm_blue = love.graphics.newImage('assets/sprites/kyrises/arrow_01c.png'),
   },
   fonts = {
     default = love.graphics.newFont('assets/fonts/GoldBox.ttf')
@@ -32,7 +34,7 @@ local effect_spiral_white_grid = anim8.newGrid(36, 32, assets.effects.spiral_whi
 local effect_spiral_white = anim8.newAnimation(effect_spiral_white_grid('1-7', 1), 0.08, 'pauseAtEnd'):flipH()
 
 local effect_bolt_white_grid = anim8.newGrid(44, 32, assets.effects.bolt_white:getWidth(), assets.effects.bolt_white:getHeight())
-local effect_bolt_white = anim8.newAnimation(effect_bolt_white_grid('1-5', 1), 0.1, 'pauseAtEnd'):flipH()
+local effect_bolt_white = anim8.newAnimation(effect_bolt_white_grid('1-5', 1), 0.1):flipH()
 
 local animations = {
   effect = {

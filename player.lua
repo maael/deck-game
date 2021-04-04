@@ -13,6 +13,7 @@ function Player.new(level, player_spawn)
     level = level,
     camera = level.camera,
     name = 'Player',
+    type = 'player',
     is_player = true,
     health = 100,
     x = player_spawn.x,
@@ -41,10 +42,10 @@ function Player.new(level, player_spawn)
     clock = 0,
     hand = {
       cards.hp,
-      cards.manastorm,
+      cards.slash,
       cards.manastorm
     },
-    deck = {cards.manastorm, cards.hp},
+    deck = {cards.slash, cards.hp},
     discard = {},
     controls = controls
   }
@@ -184,29 +185,8 @@ function Player:update(dt)
   self.x = self.physics.body:getX()
   self.y = self.physics.body:getY()
   self.animations[self.current_anim].anim:update(dt)
-  local active_effects  = {}
-  for i, effect in pairs(self.effects) do
-    if (effect.anim.status ~= 'paused') then
-      table.insert(active_effects, effect)
-      if (effect.update ~= nil) then
-        effect.update(dt, effect, self)
-      end
-    end
-  end
-  self.effects = active_effects
   local cam_x, cam_y = self.level.camera:toScreen(self.x, self.y)
   self.light:SetPosition(cam_x, cam_y)
-end
-
-function Player:drawEffects (direction_modifier)
-  for i, effect in pairs(self.effects) do
-    if (effect.color) then
-      love.graphics.setColor(effect.color);
-    else
-      love.graphics.setColor(255, 255, 255, 1);
-    end
-    effect.draw(direction_modifier, effect, self)
-  end
 end
 
 function Player:drawDebug ()
@@ -222,8 +202,10 @@ function Player:drawDebug ()
     love.graphics.points(self.x, self.y)
     -- Debug effects
     for i, effect in pairs(self.effects) do
-      love.graphics.setColor(255, 0, 0, 1);
-      love.graphics.polygon('line', effect.physics.body:getWorldPoints(effect.physics.shape:getPoints()))
+      if (effect.physics ~= nil) then
+        love.graphics.setColor(255, 0, 0, 1);
+        love.graphics.polygon('line', effect.physics.body:getWorldPoints(effect.physics.shape:getPoints()))
+      end
     end
   end
 end
@@ -238,7 +220,6 @@ function Player:draw()
   local direction_modifier = self.current_direction == 'right' and 1 or -1
   love.graphics.setColor({255, 255, 255, 1})
   self:drawPlayer(direction_modifier)
-  self:drawEffects(direction_modifier)
   self:drawDebug()
   love.graphics.pop()
 end
