@@ -4,7 +4,23 @@ local cards = {
   hp = {
     img = assets.cards.hp,
     onPlay = function (player)
-      player:setHealth(20)
+      player:setHealth(50)
+      local effect = {
+        type = 'player_effect',
+        color = {0, 255, 0, 0.5},
+        attached = true,
+        is_active = true,
+        image = assets.animations.effect.spiral_white.image,
+        anim = assets.animations.effect.spiral_white.anim:clone(),
+        update = function (dt, effect)
+          effect.anim:update(dt)
+        end,
+        draw = function (direction_modifier, effect, player)
+          local anim_w, anim_h = effect.anim:getDimensions()
+          effect.anim:draw(effect.image, player.x - (anim_w / 4), player.y - (anim_h / 2), 0, 1, 1, player.size / 2, player.size / 2)
+        end,
+      }
+      table.insert(player.effects, effect)
     end,
     mana = 3
   },
@@ -30,7 +46,7 @@ local cards = {
           y = player.y
         },
         dir_offset = 0,
-        damage = 5,
+        damage = 25,
         update = function (dt, effect, player)
           local ex, ey = effect.physics.body:getPosition()
           ex = ex - effect.dir_offset;
@@ -42,11 +58,12 @@ local cards = {
           effect.physics.body:setPosition(ex + xo + effect.dir_offset, ey + yo)
           effect.anim:update(dt)
         end,
+        draw = function (direction_modifier, effect, player)
+          effect.anim:draw(effect.image, player.x, player.y - (effect.image:getHeight() / 4), 0,
+          direction_modifier, 1, player.size / 2, player.size / 2)
+        end,
         onCollide = function (enemy, effect)
           enemy:setHealth(-effect.damage)
-        end,
-        onEnd = function (effect)
-          print("END")
         end
       }
       local anim_w, anim_h = effect.anim:getDimensions()

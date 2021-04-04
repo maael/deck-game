@@ -40,7 +40,7 @@ function Player.new(level, player_spawn)
     mana_regen = 1,
     clock = 0,
     hand = {
-      cards.manastorm,
+      cards.hp,
       cards.manastorm,
       cards.manastorm
     },
@@ -188,7 +188,9 @@ function Player:update(dt)
   for i, effect in pairs(self.effects) do
     if (effect.anim.status ~= 'paused') then
       table.insert(active_effects, effect)
-      effect.update(dt, effect, self)
+      if (effect.update ~= nil) then
+        effect.update(dt, effect, self)
+      end
     end
   end
   self.effects = active_effects
@@ -198,8 +200,12 @@ end
 
 function Player:drawEffects (direction_modifier)
   for i, effect in pairs(self.effects) do
-    effect.anim:draw(effect.image, self.x, self.y - (effect.image:getHeight() / 4), 0,
-      direction_modifier, 1, self.size / 2, self.size / 2)
+    if (effect.color) then
+      love.graphics.setColor(effect.color);
+    else
+      love.graphics.setColor(255, 255, 255, 1);
+    end
+    effect.draw(direction_modifier, effect, self)
   end
 end
 
