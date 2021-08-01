@@ -22,6 +22,18 @@ The concept is that you have to theory-craft decks to make it easier to fight th
 
 I did have some idea that it would be a robot lost in an abandoned old world similar to Nier: Automata/BLAME!, with the cards being new circuits it can socket to get new abilities - and trying to either restore some hope to the world or find out what happened, or a bit of both. But I'm not too invested in this. I'll work on the story more after the core gameplay loop is complete and basic features are there.
 
+## Gameplay
+
+Loot the environment and enemies to collect cards and parts for cards, to build a deck, to then use to do real time action combat.
+
+### Controls
+
+- A/D - Swap cards
+- S - Use card
+- E - Interact, for example loot glowing items in the Environment
+- Escape - Open/Close Menu
+  - Enter - While in Menu, selects Option (only Exit works at the moment)
+
 ## Development
 
 Requires [LÖVE](https://www.love2d.org/) to be installed, follow the instruction on their website.
@@ -36,7 +48,14 @@ The used vendor plugins are in `./vendor`. Any alterations that have been made w
 
 ## Building
 
-> TBC
+```sh
+cd deck-game
+rm DeckGame.love
+zip -9 -r DeckGame.love .
+cat love.exe DeckGame.love > DeckGame.exe
+```
+
+Then put `DeckGame.exe` in the folder `love.exe` came from, with the `.dll` files.
 
 ## Technologies
 

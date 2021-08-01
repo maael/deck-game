@@ -6,11 +6,11 @@ local assets = {
     dungeon_ii = love.graphics.newImage("assets/0x72_dungeon_tiles.png"),
   },
   cards = {
-    artifact = love.graphics.newImage('assets/sprites/cards/artifact.PNG'),
-    hp = love.graphics.newImage('assets/sprites/cards/HP.PNG'),
-    manastorm = love.graphics.newImage('assets/sprites/cards/mana_storm.PNG'),
-    stoneskin = love.graphics.newImage('assets/sprites/cards/stoneskin.PNG'),
-    chest = love.graphics.newImage('assets/sprites/cards/chest.PNG'),
+    artifact = love.graphics.newImage('assets/sprites/cards/artifact.png'),
+    hp = love.graphics.newImage('assets/sprites/cards/HP.png'),
+    manastorm = love.graphics.newImage('assets/sprites/cards/mana_storm.png'),
+    stoneskin = love.graphics.newImage('assets/sprites/cards/stoneskin.png'),
+    chest = love.graphics.newImage('assets/sprites/cards/chest.png'),
   },
   items = {
     shard_blue = love.graphics.newImage('assets/sprites/kyrises/shard_01c.png'),
