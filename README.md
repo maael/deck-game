@@ -28,11 +28,20 @@ Loot the environment and enemies to collect cards and parts for cards, to build 
 
 ### Controls
 
+- Arrow keys - Move
 - A/D - Swap cards
+- Left Shift - Sprint
 - S - Use card
 - E - Interact, for example loot glowing items in the Environment
-- Escape - Open/Close Menu
+- Q/Escape - Open/Close Menu
   - Enter - While in Menu, selects Option (only Exit works at the moment)
+
+### Current cards
+
+- HP Potion - Heals you
+- Chest - Does nothing currently
+- Slash - Weak close range melee attack that strikes in front of you and above and below
+- Manastorm - Medium strength ranged magic attack consisting of 4 or 5 bullets
 
 ## Development
 
